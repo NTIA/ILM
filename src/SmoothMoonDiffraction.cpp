@@ -29,7 +29,7 @@ The ratio 1/3.
  |      Returns:  A_r__db           - Smooth-earth diffraction loss, in dB
  |
  *===========================================================================*/
-double SmoothEarthDiffraction(double d__meter, double f__mhz, double theta_los, 
+double SmoothMoonDiffraction(double d__meter, double f__mhz, double theta_los, 
     double d_hzn__meter[2], double h_e__meter[2], complex<double> Z_g)
 {
     double a__meter[3];

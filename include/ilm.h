@@ -324,7 +324,7 @@ ILM_API double SigmaHFunction(
     double delta_h__meter
 );
 
-ILM_API double SmoothEarthDiffraction(
+ILM_API double SmoothMoonDiffraction(
     double d__meter,
     double f__mhz,
     double theta_los,

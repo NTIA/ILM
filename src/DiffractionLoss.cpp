@@ -28,7 +28,7 @@ double DiffractionLoss(double d__meter, double d_hzn__meter[2], double h_e__mete
 {
     double A_k__db = KnifeEdgeDiffraction(d__meter, f__mhz, theta_los, d_hzn__meter);
 
-    double A_r__db = SmoothEarthDiffraction(d__meter, f__mhz, theta_los, d_hzn__meter, h_e__meter, Z_g);
+    double A_r__db = SmoothMoonDiffraction(d__meter, f__mhz, theta_los, d_hzn__meter, h_e__meter, Z_g);
 
     double delta_h_d__meter = TerrainRoughness(d__meter, delta_h__meter);
 

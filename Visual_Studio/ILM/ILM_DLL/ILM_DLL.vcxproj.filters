@@ -77,7 +77,7 @@
     <ClCompile Include="..\..\..\src\SigmaHFunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\SmoothEarthDiffraction.cpp">
+    <ClCompile Include="..\..\..\src\SmoothMoonDiffraction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\TerrainRoughness.cpp">

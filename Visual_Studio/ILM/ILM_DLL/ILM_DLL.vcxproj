@@ -163,7 +163,7 @@
     <ClCompile Include="..\..\..\src\LongleyRice.cpp" />
     <ClCompile Include="..\..\..\src\QuickPfl.cpp" />
     <ClCompile Include="..\..\..\src\SigmaHFunction.cpp" />
-    <ClCompile Include="..\..\..\src\SmoothEarthDiffraction.cpp" />
+    <ClCompile Include="..\..\..\src\SmoothMoonDiffraction.cpp" />
     <ClCompile Include="..\..\..\src\TerrainRoughness.cpp" />
     <ClCompile Include="..\..\..\src\ValidateInputs.cpp" />
     <ClCompile Include="..\..\..\src\Variability.cpp" />
