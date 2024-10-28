@@ -1,9 +1,7 @@
+/* Standard includes. */
 #include <complex>
-#include <math.h>
-#include <algorithm>
-#include <stdlib.h>
-#include <vector>
 
+/* Usings. */
 using namespace std;
 
 // Export the DLL functions as "C" and not C++

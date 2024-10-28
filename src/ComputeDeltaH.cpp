@@ -1,3 +1,9 @@
+/* Standard includes. */
+#include <algorithm>
+#include <vector>
+#include <cmath>
+
+/* Local includes. */
 #include "../include/ilm.h"
 
 /*=============================================================================
