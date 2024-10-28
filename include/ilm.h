@@ -57,16 +57,12 @@ Dim of x and y.
 The ratio of a circle's circumference to its diameter.
 */
 #define PI 3.1415926535897932384
+
 /**
 @brief
 The radius of Earth's moon in meters.
 */
 #define a_e__meter 1737400
-/**
-@brief
-The ratio 1/3.
-*/
-#define THIRD 1.0 / 3.0
 
 /**
 @brief

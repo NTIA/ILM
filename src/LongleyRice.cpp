@@ -9,6 +9,12 @@
 #include "../include/Errors.h"
 #include "../include/Warnings.h"
 
+/**
+@brief
+The ratio 1/3.
+*/
+#define THIRD 1.0 / 3.0
+
 
 /*=============================================================================
  |

@@ -6,6 +6,12 @@
 /* Local includes. */
 #include "../include/ilm.h"
 
+/**
+@brief
+The ratio 1/3.
+*/
+#define THIRD 1.0 / 3.0
+
 /*=============================================================================
  |
  |  Description:  Compute the smooth earth diffraction loss using the 
