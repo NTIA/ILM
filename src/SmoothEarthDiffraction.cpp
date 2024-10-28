@@ -40,12 +40,12 @@ double SmoothEarthDiffraction(double d__meter, double f__mhz, double theta_los,
     double x__km[3];
     double C_0[3];
 
-    double theta_nlos = d__meter / a_e__meter - theta_los;                          // [Algorithm, Eqn 4.12]
+    double theta_nlos = d__meter / a_m__meter - theta_los;                          // [Algorithm, Eqn 4.12]
     double d_ML__meter = d_hzn__meter[0] + d_hzn__meter[1];                         // Maximum line-of-sight distance for actual path
 
     // [RLS, A-30b, rearranged]
     // compute 3 radii
-    a__meter[0] = (d__meter - d_ML__meter) / (d__meter / a_e__meter - theta_los);   // which is a_e__meter when theta_los = d_ML__meter / a_e__meter
+    a__meter[0] = (d__meter - d_ML__meter) / (d__meter / a_m__meter - theta_los);   // which is a_m__meter when theta_los = d_ML__meter / a_m__meter
     a__meter[1] = 0.5 * pow(d_hzn__meter[0], 2) / h_e__meter[0];                    // Compute the radius of the effective earth for terminal j using [Volger 1964, Eqn 3] re-arranged
     a__meter[2] = 0.5 * pow(d_hzn__meter[1], 2) / h_e__meter[1];                    // Compute the radius of the effective earth for terminal j using [Volger 1964, Eqn 3] re-arranged
 
@@ -56,7 +56,7 @@ double SmoothEarthDiffraction(double d__meter, double f__mhz, double theta_los,
     for (int i = 0; i < 3; i++)
     {
         // C_0 = (4 / 3k) ^ (1 / 3) [Vogler 1964, Eqn 2]
-        C_0[i] = pow((4.0 / 3.0) * a_e__meter / a__meter[i], THIRD);
+        C_0[i] = pow((4.0 / 3.0) * a_m__meter / a__meter[i], THIRD);
 
         // [Vogler 1964, Eqn 6a / 7a]
         K[i] = 0.017778 * C_0[i] * pow(f__mhz, -THIRD) / abs(Z_g);

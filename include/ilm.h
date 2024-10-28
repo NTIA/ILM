@@ -62,7 +62,7 @@ The ratio of a circle's circumference to its diameter.
 @brief
 The radius of Earth's moon in meters.
 */
-#define a_e__meter 1737400
+#define a_m__meter 1737400
 
 /**
 @brief

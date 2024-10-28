@@ -51,7 +51,7 @@ void QuickPfl(double pfl[], double h__meter[2], double theta_hzn[2],
         h_e__meter[1] = h__meter[1] + fdim(pfl[np + 2], fit_rx);
 
         for (int i = 0; i < 2; i++)
-            d_hzn__meter[i] = sqrt(2.0 * h_e__meter[i] * a_e__meter) * exp(-0.07 * sqrt(*delta_h__meter / MAX(h_e__meter[i], 5.0)));
+            d_hzn__meter[i] = sqrt(2.0 * h_e__meter[i] * a_m__meter) * exp(-0.07 * sqrt(*delta_h__meter / MAX(h_e__meter[i], 5.0)));
 
         double combined_horizons__meter = d_hzn__meter[0] + d_hzn__meter[1];
         if (combined_horizons__meter <= *d__meter)
@@ -61,13 +61,13 @@ void QuickPfl(double pfl[], double h__meter[2], double theta_hzn[2],
             for (int i = 0; i < 2; i++)
             {
                 h_e__meter[i] = h_e__meter[i] * q;
-                d_hzn__meter[i] = sqrt(2.0 * h_e__meter[i] * a_e__meter) * exp(-0.07 * sqrt(*delta_h__meter / MAX(h_e__meter[i], 5.0)));
+                d_hzn__meter[i] = sqrt(2.0 * h_e__meter[i] * a_m__meter) * exp(-0.07 * sqrt(*delta_h__meter / MAX(h_e__meter[i], 5.0)));
             }
         }
 
         for (int i = 0; i < 2; i++)
         {
-            q = sqrt(2.0 * h_e__meter[i] * a_e__meter);
+            q = sqrt(2.0 * h_e__meter[i] * a_m__meter);
             theta_hzn[i] = (0.65 * *delta_h__meter * (q / d_hzn__meter[i] - 1.0) - 2.0 * h_e__meter[i]) / q;
         }
     }

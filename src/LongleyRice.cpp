@@ -44,7 +44,7 @@ int LongleyRice(double theta_hzn[2], double f__mhz, complex<double> Z_g, double 
     // [RLS, A-8 & B-8]
     double d_hzn_s__meter[2];
     for (int i = 0; i < 2; i++)
-        d_hzn_s__meter[i] = sqrt(2.0 * h_e__meter[i] * a_e__meter);
+        d_hzn_s__meter[i] = sqrt(2.0 * h_e__meter[i] * a_m__meter);
 
     // [RLS, A-11]
     double d_ls__meter = d_hzn_s__meter[0] + d_hzn_s__meter[1];
@@ -53,7 +53,7 @@ int LongleyRice(double theta_hzn[2], double f__mhz, complex<double> Z_g, double 
     double d_l__meter = d_hzn__meter[0] + d_hzn__meter[1];
 
     // [RLS, A-13 & B-11]
-    double theta_e = -MAX(theta_hzn[0] + theta_hzn[1], -d_l__meter / a_e__meter);
+    double theta_e = -MAX(theta_hzn[0] + theta_hzn[1], -d_l__meter / a_m__meter);
 
     // Check validity of small angle approximation
     if (abs(theta_hzn[0]) > 200e-3)
@@ -80,7 +80,7 @@ int LongleyRice(double theta_hzn[2], double f__mhz, complex<double> Z_g, double 
     double k = 2 * PI * (f__mhz * 1e6) / c;
 
     // [RLS, A-20 & B-18]
-    double X_ae__meter = pow(k / pow(a_e__meter, 2), -THIRD);
+    double X_ae__meter = pow(k / pow(a_m__meter, 2), -THIRD);
 
     // [RLS, A-16 & B-14]
     double d_3__meter = MAX(d_ls__meter, d_l__meter + 1.3787 * X_ae__meter);

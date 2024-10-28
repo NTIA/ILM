@@ -48,7 +48,7 @@ void InitializeArea(int site_criteria[2], double delta_h__meter,
         }
 
         // [RLS, A-8 & B-8]
-        double d_ls__meter = sqrt(2.0 * h_e__meter[i] * a_e__meter);
+        double d_ls__meter = sqrt(2.0 * h_e__meter[i] * a_m__meter);
 
         // [RLS, A-9 & B-9]
         d_l__meter[i] = d_ls__meter * exp(-0.07 * sqrt(delta_h__meter / MAX(h_e__meter[i], 5)));
