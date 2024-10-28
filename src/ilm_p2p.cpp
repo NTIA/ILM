@@ -56,7 +56,6 @@ int PointToPoint_Ex(double h_tx__meter, double h_rx__meter, double pfl[], double
     int pol, double epsilon, double sigma, double p, double *A__db, 
     long *warnings, IntermediateValues *interValues)
 {
-    double N_s;                 // Surface refractivity, in N-Units
     double delta_h__meter;      // Terrain irregularity parameter
     double d__meter;            // Path distance, in meters
     complex<double> Z_g;	    // Ground impedance
