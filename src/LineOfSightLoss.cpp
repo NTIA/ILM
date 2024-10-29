@@ -54,11 +54,6 @@ double LineOfSightLoss(
     double d_ls__meter,
     double f__mhz
 ) {
-    double delta_h_d__meter = TerrainRoughness(
-        s__meter,
-        delta_h__meter
-    );
-
     // [RLS, A-67 & B-65].
     double sigma_h_s__meter = (delta_h__meter / 1.282) * exp(-pow(delta_h__meter, 0.25) / 2.0);
 

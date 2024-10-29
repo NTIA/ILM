@@ -5,9 +5,10 @@ This file contains the SmoothMoonDiffraction() and HeightFunction() functions.
 */
 
 /* Standard includes. */
+#include <cstdlib>
 #include <cmath>
 #include <complex>
-#include <cstdlib>
+
 
 /* Local includes. */
 #include "./include/ilm.h"
@@ -93,8 +94,6 @@ double SmoothMoonDiffraction(
         // [Vogler 1964, Fig 4], [RLS, A-76].
         B_0[i] = 1.607 - abs(K[i]);
     }
-
-    double A = 151.03;
 
     // Compute x__km for each radius [RLS].
     x__km[1] = B_0[1] * pow(C_0[1], 2) * pow(f__mhz, THIRD) * d__km[1];
