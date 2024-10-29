@@ -14,7 +14,6 @@ irregularity parameter, delta_h, in meters.
 /* Local includes. */
 #include "./include/ilm.h"
 
-
 /**
 * @brief
 Compute the terrain irregularity parameter, delta_h.

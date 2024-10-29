@@ -214,7 +214,7 @@ int Area_Ex(
     double theta_hzn[2];
     double d_hzn__meter[2];
     double h_e__meter[2];
-    complex<double> Z_g;
+    std::complex<double> Z_g;
     double A_ref__db = 0.0;
 
     InitializePointToPoint(

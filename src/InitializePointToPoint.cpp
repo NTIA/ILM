@@ -39,10 +39,10 @@ void InitializePointToPoint(
     int pol,
     double epsilon,
     double sigma,
-    complex<double> *Z_g
+    std::complex<double> *Z_g
 ) {
     // Complex relative permittivity.
-    complex<double> ep_r = complex<double>(epsilon, 18000.0 * sigma / f__mhz);
+    std::complex<double> ep_r = std::complex<double>(epsilon, 18000.0 * sigma / f__mhz);
 
     // [RLS, A-3].
     // Ground impedance (horizontal polarization).

@@ -144,7 +144,7 @@ int PointToPoint_Ex(
     // Path distance, in meters.
     double d__meter;
     // Ground impedance.
-    complex<double> Z_g;
+    std::complex<double> Z_g;
     // Terminal horizon angles.
     double theta_hzn[2];
     // Terminal horizon distances.

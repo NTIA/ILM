@@ -26,9 +26,6 @@ ILM.dll compilation date and time.
 */
 #define COMPILE_TIME __DATE__ " " __TIME__
 
-/* Usings. */
-using namespace std;
-
 /* Constants. */
 
 /**
@@ -194,7 +191,7 @@ ILM_API double DiffractionLoss(
     double d__meter,
     double d_hzn__meter[2],
     double h_e__meter[2],
-    complex<double> Z_g,
+    std::complex<double> Z_g,
     double delta_h__meter,
     double h__meter[2],
     double theta_los,
@@ -236,7 +233,7 @@ ILM_API void InitializePointToPoint(
     int pol,
     double epsilon,
     double sigma,
-    complex<double> *Z_g
+    std::complex<double> *Z_g
 );
 
 ILM_API double InverseComplementaryCumulativeDistributionFunction(
@@ -261,7 +258,7 @@ ILM_API void LinearLeastSquaresFit(
 ILM_API double LineOfSightLoss(
     double d__meter,
     double h_e__meter[2],
-    complex<double> Z_g,
+    std::complex<double> Z_g,
     double delta_h__meter,
     double M_d,
     double A_d0,
@@ -272,7 +269,7 @@ ILM_API double LineOfSightLoss(
 ILM_API int LongleyRice(
     double theta_hzn[2],
     double f__mhz,
-    complex<double> Z_g,
+    std::complex<double> Z_g,
     double d_hzn__meter[2],
     double h_e__meter[2],
     double delta_h__meter,
@@ -303,7 +300,7 @@ ILM_API double SmoothMoonDiffraction(
     double theta_los,
     double d_hzn__meter[2],
     double h_e__meter[2],
-    complex<double> Z_g
+    std::complex<double> Z_g
 );
 
 ILM_API double TerrainRoughness(

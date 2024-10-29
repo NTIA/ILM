@@ -49,7 +49,7 @@ Loss, in dB.
 double LineOfSightLoss(
     double s__meter,
     double h_e__meter[2],
-    complex<double> Z_g,
+    std::complex<double> Z_g,
     double delta_h__meter,
     double m_d,
     double A_ed,
@@ -68,7 +68,7 @@ double LineOfSightLoss(
     double sin_psi = (h_e__meter[0] + h_e__meter[1]) / sqrt(pow(s__meter, 2) + pow(h_e__meter[0] + h_e__meter[1], 2));
 
     // [RLS, A-66 & B-64].
-    complex<double> R_e = (sin_psi - Z_g) / (sin_psi + Z_g) * exp(-k * sigma_h_s__meter * sin_psi);
+    std::complex<double> R_e = (sin_psi - Z_g) / (sin_psi + Z_g) * exp(-k * sigma_h_s__meter * sin_psi);
 
     // [RLS, A-69 & B-67].
     double q = pow(R_e.real(), 2) + pow(R_e.imag(), 2);
@@ -83,7 +83,7 @@ double LineOfSightLoss(
         delta_phi = M_PI - pow(M_PI / 2.0, 2) / delta_phi;
 
     // [RLS, A-71 & B-69].
-    complex<double> rr = complex<double>(cos(delta_phi), -sin(delta_phi)) + R_e;
+    std::complex<double> rr = std::complex<double>(cos(delta_phi), -sin(delta_phi)) + R_e;
     double A_t__db = -10.0 * log10(pow(rr.real(), 2) + pow(rr.imag(), 2));
 
     // [RLS, A-64 & B-62].

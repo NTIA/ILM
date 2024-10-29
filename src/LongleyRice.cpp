@@ -73,7 +73,7 @@ Error code.
 int LongleyRice(
     double theta_hzn[2],
     double f__mhz,
-    complex<double> Z_g,
+    std::complex<double> Z_g,
     double d_hzn__meter[2],
     double h_e__meter[2],
     double delta_h__meter,

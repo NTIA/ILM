@@ -51,7 +51,7 @@ double SmoothMoonDiffraction(
     double theta_los,
     double d_hzn__meter[2],
     double h_e__meter[2],
-    complex<double> Z_g
+    std::complex<double> Z_g
 ) {
     double a__meter[3];
     double d__km[3];

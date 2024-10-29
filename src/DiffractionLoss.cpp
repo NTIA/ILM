@@ -13,7 +13,6 @@ in the ILM.
 /* Local includes. */
 #include "./include/ilm.h"
 
-
 /**
 @brief
 Compute the diffraction loss at a specified distance
@@ -50,7 +49,7 @@ double DiffractionLoss(
     double d__meter,
     double d_hzn__meter[2],
     double h_e__meter[2],
-    complex<double> Z_g,
+    std::complex<double> Z_g,
     double delta_h__meter,
     double h__meter[2],
     double theta_los,
