@@ -8,7 +8,7 @@ This file contains the LinearLeastSquaresFit() function.
 #include <cmath>
 
 /* Local includes. */
-#include "../include/ilm.h"
+#include "./include/ilm.h"
 
 /**
 @brief

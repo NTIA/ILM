@@ -6,7 +6,7 @@ horizon angles and distances.
 */
 
 /* Local includes. */
-#include "../include/ilm.h"
+#include "./include/ilm.h"
 
 /**
 @brief

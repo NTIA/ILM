@@ -8,9 +8,9 @@ This file contains the PointToPoint() and PointToPoint_Ex() functions.
 #include <complex>
 
 /* Local includes. */
-#include "../include/ilm.h"
-#include "../include/Enums.h"
-#include "../include/Errors.h"
+#include "./include/ilm.h"
+#include "./include/Enums.h"
+#include "./include/Errors.h"
 
 /**
 @brief

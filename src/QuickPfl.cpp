@@ -8,7 +8,7 @@ This file contains the QuickPfl() function.
 #include <cmath>
 
 /* Local includes. */
-#include "../include/ilm.h"
+#include "./include/ilm.h"
 
 /**
 @brief

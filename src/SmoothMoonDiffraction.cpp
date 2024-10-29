@@ -10,7 +10,7 @@ This file contains the SmoothMoonDiffraction() and HeightFunction() functions.
 #include <cstdlib>
 
 /* Local includes. */
-#include "../include/ilm.h"
+#include "./include/ilm.h"
 
 /**
 @brief

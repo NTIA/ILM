@@ -10,10 +10,10 @@ This file contains the LongleyRice() function.
 #include <cstdlib>
 
 /* Local includes. */
-#include "../include/ilm.h"
-#include "../include/Enums.h"
-#include "../include/Errors.h"
-#include "../include/Warnings.h"
+#include "./include/ilm.h"
+#include "./include/Enums.h"
+#include "./include/Errors.h"
+#include "./include/Warnings.h"
 
 /**
 @brief

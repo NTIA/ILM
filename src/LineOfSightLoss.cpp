@@ -9,7 +9,7 @@ This file contains the LineOfSightLoss() function.
 #include <complex>
 
 /* Local includes. */
-#include "../include/ilm.h"
+#include "./include/ilm.h"
 
 /**
 @brief

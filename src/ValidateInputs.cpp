@@ -5,10 +5,10 @@ This file contains the ValidateInputs() function.
 */
 
 /* Local includes. */
-#include "../include/ilm.h"
-#include "../include/Enums.h"
-#include "../include/Errors.h"
-#include "../include/Warnings.h"
+#include "./include/ilm.h"
+#include "./include/Enums.h"
+#include "./include/Errors.h"
+#include "./include/Warnings.h"
 
 /**
 @brief

@@ -11,7 +11,7 @@ irregularity parameter, delta_h, in meters.
 #include <cmath>
 
 /* Local includes. */
-#include "../include/ilm.h"
+#include "./include/ilm.h"
 
 /**
 * @brief

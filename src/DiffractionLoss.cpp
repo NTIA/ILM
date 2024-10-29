@@ -10,7 +10,7 @@ in the ILM.
 #include <complex>
 
 /* Local includes. */
-#include "../include/ilm.h"
+#include "./include/ilm.h"
 
 /**
 @brief
