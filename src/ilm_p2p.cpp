@@ -175,13 +175,13 @@ int PointToPoint_Ex(
     // Number of points in the pfl.
     int np = int(pfl[0]);
 
-    p /= 100;
+    p /= 100.0;
 
     /* Compute the average path height, ignoring first and last 10%. */
     // 10% of np
     int p10 = int(0.1 * np);
     // Height of the system above mean sea level.
-    double h_sys__meter = 0;
+    double h_sys__meter = 0.0;
 
     for (int i = p10; i <= np - p10; i++)
         h_sys__meter += pfl[i + 2];
@@ -208,7 +208,7 @@ int PointToPoint_Ex(
     );
 
     // Reference attenuation, in dB.
-    double A_ref__db = 0;
+    double A_ref__db = 0.0;
     int propmode = MODE__NOT_SET;
     rtn = LongleyRice(
         theta_hzn,

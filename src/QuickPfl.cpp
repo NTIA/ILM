@@ -121,7 +121,7 @@ void QuickPfl(
     }
     else
     {
-        double dummy = 0;
+        double dummy = 0.0;
 
         LinearLeastSquaresFit(
             pfl,

@@ -138,7 +138,7 @@ double HeightFunction(
     {
         w = -log(K);
 
-        if (K < 1e-5 || x__km * pow(w, 3) > 5495.0)
+        if (K < 1.0E-5 || x__km * pow(w, 3) > 5495.0)
         {
             result = -117.0;
 
@@ -152,7 +152,7 @@ double HeightFunction(
     {
         result = 0.05751 * x__km - 4.343 * log(x__km);
 
-        if (x__km < 2000)
+        if (x__km < 2000.0)
         {
             w = 0.0134 * x__km * exp(-0.005 * x__km);
             result = (1.0 - w) * result + w * (17.372 * log(x__km) - 117.0);

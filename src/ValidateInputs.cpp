@@ -69,20 +69,20 @@ int ValidateInputs(
     if (f__mhz < 40.0 || f__mhz > 10000.0)
         *warnings |= WARN__FREQUENCY;
 
-    if (f__mhz < 20 || f__mhz > 20000)
+    if (f__mhz < 20.0 || f__mhz > 20000.0)
         return ERROR__FREQUENCY;
 
     if (pol != POLARIZATION__HORIZONTAL &&
         pol != POLARIZATION__VERTICAL)
         return ERROR__POLARIZATION;
 
-    if (epsilon < 1)
+    if (epsilon < 1.0)
         return ERROR__EPSILON;
 
-    if (sigma <= 0)
+    if (sigma <= 0.0)
         return ERROR__SIGMA;
 
-    if (p <= 0 || p >= 100)
+    if (p <= 0.0 || p >= 100.0)
         return ERROR__INVALID_PERCENTAGE;
 
     return SUCCESS;

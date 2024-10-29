@@ -22,7 +22,6 @@ The ratio 1/3.
 */
 #define THIRD 1.0 / 3.0
 
-
 /**
 @brief
 Compute the reference attenuation, using the Longley-Rice method.
@@ -92,9 +91,9 @@ int LongleyRice(
     double theta_e = -MAX(theta_hzn[0] + theta_hzn[1], -d_l__meter / a_m__meter);
 
     // Check validity of small angle approximation.
-    if (abs(theta_hzn[0]) > 200e-3)
+    if (abs(theta_hzn[0]) > 200.0E-3)
         *warnings |= WARN__TX_HORIZON_ANGLE;
-    if (abs(theta_hzn[1]) > 200e-3)
+    if (abs(theta_hzn[1]) > 200.0E-3)
         *warnings |= WARN__RX_HORIZON_ANGLE;
 
     if (d_hzn__meter[0] < 0.1 * d_hzn_s__meter[0])
@@ -114,7 +113,7 @@ int LongleyRice(
     // Speed of light, m/s.
     double c = 299792458.0;
     // [RLS, A-1 & B-1].
-    double k = 2 * M_PI * (f__mhz * 1E6) / c;
+    double k = 2.0 * M_PI * (f__mhz * 1.0E6) / c;
 
     // [RLS, A-20 & B-18].
     double X_ae__meter = pow(k / pow(a_m__meter, 2), -THIRD);
@@ -156,11 +155,11 @@ int LongleyRice(
 
     if (d__meter < d_min__meter)
         *warnings |= WARN__PATH_DISTANCE_TOO_SMALL_1;
-    if (d__meter < 1E3)
+    if (d__meter < 1.0E3)
         *warnings |= WARN__PATH_DISTANCE_TOO_SMALL_2;
-    if (d__meter > 1000E3)
+    if (d__meter > 1000.0E3)
         *warnings |= WARN__PATH_DISTANCE_TOO_BIG_1;
-    if (d__meter > 2000E3)
+    if (d__meter > 2000.0E3)
         *warnings |= WARN__PATH_DISTANCE_TOO_BIG_2;
 
     if (d__meter < d_ls__meter)
@@ -202,8 +201,8 @@ int LongleyRice(
 
         bool flag = false;
 
-        double kHat_1 = 0;
-        double kHat_2 = 0;
+        double kHat_1 = 0.0;
+        double kHat_2 = 0.0;
 
         if (d_0__meter < d_1__meter)
         {

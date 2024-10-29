@@ -44,8 +44,8 @@ void FindHorizons(
     double z_tx__meter = pfl[2] + h__meter[0];
     double z_rx__meter = pfl[np + 2] + h__meter[1];
 
-    theta_hzn[0] = (z_rx__meter - z_tx__meter) / d__meter - d__meter / (2 * a_m__meter);
-    theta_hzn[1] = -(z_rx__meter - z_tx__meter) / d__meter - d__meter / (2 * a_m__meter);
+    theta_hzn[0] = (z_rx__meter - z_tx__meter) / d__meter - d__meter / (2.0 * a_m__meter);
+    theta_hzn[1] = -(z_rx__meter - z_tx__meter) / d__meter - d__meter / (2.0 * a_m__meter);
 
     d_hzn__meter[0] = d__meter;
     d_hzn__meter[1] = d__meter;
@@ -60,8 +60,8 @@ void FindHorizons(
         d_tx__meter = d_tx__meter + xi;
         d_rx__meter = d_rx__meter - xi;
 
-        theta_tx = (pfl[i + 2] - z_tx__meter) / d_tx__meter - d_tx__meter / (2 * a_m__meter);
-        theta_rx = -(z_rx__meter - pfl[i + 2]) / d_rx__meter - d_rx__meter / (2 * a_m__meter);
+        theta_tx = (pfl[i + 2] - z_tx__meter) / d_tx__meter - d_tx__meter / (2.0 * a_m__meter);
+        theta_rx = -(z_rx__meter - pfl[i + 2]) / d_rx__meter - d_rx__meter / (2.0 * a_m__meter);
 
         if (theta_tx > theta_hzn[0])
         {

@@ -117,7 +117,7 @@ double ComputeDeltaH(
     double delta_h_d__meter = q10 - q90;
 
     // [ERL 79-ITS 67, Eqn 3], inverted.
-    double delta_h__meter = delta_h_d__meter / (1.0 - 0.8 * exp(-(d_end__meter - d_start__meter) / 50E3));
+    double delta_h__meter = delta_h_d__meter / (1.0 - 0.8 * exp(-(d_end__meter - d_start__meter) / 50.0E3));
 
     return delta_h__meter;
 }

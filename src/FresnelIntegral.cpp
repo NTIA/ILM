@@ -30,5 +30,5 @@ double FresnelIntegral(
         return 6.02 + 9.11 * sqrt(v2) - 1.27 * v2;
     else
         // [TN101v2, Eqn III.24c] and [ERL 79-ITS 67, Eqn 3.27a & 3.27b].
-        return 12.953 + 10 * log10(v2);
+        return 12.953 + 10.0 * log10(v2);
 }

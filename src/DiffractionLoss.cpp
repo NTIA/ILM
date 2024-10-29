@@ -78,10 +78,10 @@ double DiffractionLoss(
     // [RLS, A-25 & B-23].
     double term1 = sqrt((h_e__meter[0] * h_e__meter[1]) / (h__meter[0] * h__meter[1]));
     double d_l__meter = d_hzn__meter[0] + d_hzn__meter[1];
-    double q = (term1 + (-theta_los * a_m__meter + d_l__meter) / d__meter) * MIN(delta_h_d__meter * f__mhz / 47.7, 1000);
+    double q = (term1 + (-theta_los * a_m__meter + d_l__meter) / d__meter) * MIN(delta_h_d__meter * f__mhz / 47.7, 1000.0);
 
     // [RLS, A-24 & B-22].
-    double w = 1 / (1 + 0.1 * sqrt(q));
+    double w = 1.0 / (1.0 + 0.1 * sqrt(q));
 
     // [RLS, A-23 & B-21].
     double A_d__db = w * A_r__db + (1.0 - w) * A_k__db ;

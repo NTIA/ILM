@@ -215,7 +215,7 @@ int Area_Ex(
     double d_hzn__meter[2];
     double h_e__meter[2];
     complex<double> Z_g;
-    double A_ref__db = 0;
+    double A_ref__db = 0.0;
 
     InitializePointToPoint(
         f__mhz,
@@ -234,7 +234,7 @@ int Area_Ex(
         theta_hzn
     );
 
-    double d__meter = d__km * 1000;
+    double d__meter = d__km * 1000.0;
     int propmode = MODE__NOT_SET;
     rtn = LongleyRice(
         theta_hzn,
