@@ -30,17 +30,6 @@ ILM.dll compilation date and time.
 using namespace std;
 
 /* Utility functions. */
-/**
-@brief
-Maximum of x and y.
-*/
-#define MAX(x, y) (((x) > (y)) ? (x) : (y))
-
-/**
-@brief
-Minimum of x and y.
-*/
-#define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 /**
 @brief

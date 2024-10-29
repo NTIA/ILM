@@ -7,10 +7,12 @@ This file contains the InitializeArea() function.
 /* Standard includes. */
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <utility>
 
 /* Local includes. */
-#include "./include/ilm.h"
 #include "./include/Enums.h"
+#include "./include/ilm.h"
+
 
 /**
 @brief
@@ -71,7 +73,7 @@ void InitializeArea(
         double d_ls__meter = sqrt(2.0 * h_e__meter[i] * a_m__meter);
 
         // [RLS, A-9 & B-9].
-        d_l__meter[i] = d_ls__meter * exp(-0.07 * sqrt(delta_h__meter / MAX(h_e__meter[i], 5.0)));
+        d_l__meter[i] = d_ls__meter * exp(-0.07 * sqrt(delta_h__meter / std::max(h_e__meter[i], 5.0)));
 
         // [RLS, A-10 & B-10].
         theta_hzn[i] = -(2.0 * h_e__meter[i] + 0.65 * delta_h__meter * (d_ls__meter / d_l__meter[i] - 1.0)) / d_ls__meter;

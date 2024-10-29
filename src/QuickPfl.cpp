@@ -6,6 +6,7 @@ This file contains the QuickPfl() function.
 
 /* Standard includes. */
 #include <cmath>
+#include <utility>
 
 /* Local includes. */
 #include "./include/ilm.h"
@@ -69,10 +70,10 @@ void QuickPfl(
     */
 
     // Take lesser: 10% of horizon distance or 15x terminal height.
-    d_start__meter = MIN(15.0 * h__meter[0], 0.1 * d_hzn__meter[0]);
+    d_start__meter = std::min(15.0 * h__meter[0], 0.1 * d_hzn__meter[0]);
 
     // Same, but measured from the far end of the link.
-    d_end__meter = *d__meter - MIN(15.0 * h__meter[1], 0.1 * d_hzn__meter[1]);
+    d_end__meter = *d__meter - std::min(15.0 * h__meter[1], 0.1 * d_hzn__meter[1]);
 
     *delta_h__meter = ComputeDeltaH(
         pfl,
@@ -99,7 +100,7 @@ void QuickPfl(
         h_e__meter[1] = h__meter[1] + fdim(pfl[np + 2], fit_rx);
 
         for (int i = 0; i < 2; i++)
-            d_hzn__meter[i] = sqrt(2.0 * h_e__meter[i] * a_m__meter) * exp(-0.07 * sqrt(*delta_h__meter / MAX(h_e__meter[i], 5.0)));
+            d_hzn__meter[i] = sqrt(2.0 * h_e__meter[i] * a_m__meter) * exp(-0.07 * sqrt(*delta_h__meter / std::max(h_e__meter[i], 5.0)));
 
         double combined_horizons__meter = d_hzn__meter[0] + d_hzn__meter[1];
         if (combined_horizons__meter <= *d__meter)
@@ -109,7 +110,7 @@ void QuickPfl(
             for (int i = 0; i < 2; i++)
             {
                 h_e__meter[i] = h_e__meter[i] * q;
-                d_hzn__meter[i] = sqrt(2.0 * h_e__meter[i] * a_m__meter) * exp(-0.07 * sqrt(*delta_h__meter / MAX(h_e__meter[i], 5.0)));
+                d_hzn__meter[i] = sqrt(2.0 * h_e__meter[i] * a_m__meter) * exp(-0.07 * sqrt(*delta_h__meter / std::max(h_e__meter[i], 5.0)));
             }
         }
 

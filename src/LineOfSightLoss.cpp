@@ -8,9 +8,11 @@ This file contains the LineOfSightLoss() function.
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <complex>
+#include <utility>
 
 /* Local includes. */
 #include "./include/ilm.h"
+
 
 /**
 @brief
@@ -90,7 +92,7 @@ double LineOfSightLoss(
     // [RLS, A-63 & B-61].
     double D_1 = 47.7;
     double D_2 = 10.0E3;
-    double w = 1.0 / (1.0 + D_1 * k * delta_h__meter / MAX(D_2, d_ls__meter));
+    double w = 1.0 / (1.0 + D_1 * k * delta_h__meter / std::max(D_2, d_ls__meter));
 
     // [RLS, A-62 & B-60].
     double A_los__db = (1.0 - w) * A_d__db + w * A_t__db;

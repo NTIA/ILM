@@ -9,12 +9,14 @@ This file contains the LongleyRice() function.
 #include <cmath>
 #include <complex>
 #include <cstdlib>
+#include <utility>
 
 /* Local includes. */
-#include "./include/ilm.h"
 #include "./include/Enums.h"
 #include "./include/Errors.h"
+#include "./include/ilm.h"
 #include "./include/Warnings.h"
+
 
 /**
 @brief
@@ -116,7 +118,7 @@ int LongleyRice(
     double X_ae__meter = pow(k / pow(a_m__meter, 2), -THIRD);
 
     // [RLS, A-16 & B-14].
-    double d_3__meter = MAX(d_ls__meter, d_l__meter + 1.3787 * X_ae__meter);
+    double d_3__meter = std::max(d_ls__meter, d_l__meter + 1.3787 * X_ae__meter);
     // [RLS, A-17 & B-15].
     double d_4__meter = d_3__meter + 2.7574 * X_ae__meter;
 
@@ -173,7 +175,7 @@ int LongleyRice(
         if (A_ed__db >= 0.0)  // [RLS, A.1.5, CASE 1].
         {
             // [RLS, A-37 & B-35].
-            d_0__meter = MIN(0.5 * d_l__meter, 1.908 * k * h_e__meter[0] * h_e__meter[1]);
+            d_0__meter = std::min(0.5 * d_l__meter, 1.908 * k * h_e__meter[0] * h_e__meter[1]);
             // [RLS, A-38 & B-36].
             d_1__meter = 3.0 / 4.0 * d_0__meter + d_l__meter / 4.0;
         }
@@ -182,7 +184,7 @@ int LongleyRice(
             // [RLS, A-47].
             d_0__meter = 1.908 * k * h_e__meter[0] * h_e__meter[1];
             // [RLS, A-48].
-            d_1__meter = MAX(-A_ed__db / m_d, d_l__meter / 4.0);
+            d_1__meter = std::max(-A_ed__db / m_d, d_l__meter / 4.0);
         }
 
         double A_1__db = LineOfSightLoss(
@@ -217,7 +219,7 @@ int LongleyRice(
             double term1 = log(d_ls__meter / d_0__meter);
 
             // [ERL 79-ITS 67, Eqn 3.20].
-            kHat_2 = MAX(0.0, ((d_ls__meter - d_0__meter) * (A_1__db - A_0__db) - (d_1__meter - d_0__meter) * (A_2__db - A_0__db)) / ((d_ls__meter - d_0__meter) * log(d_1__meter / d_0__meter) - (d_1__meter - d_0__meter) * term1));
+            kHat_2 = std::max(0.0, ((d_ls__meter - d_0__meter) * (A_1__db - A_0__db) - (d_1__meter - d_0__meter) * (A_2__db - A_0__db)) / ((d_ls__meter - d_0__meter) * log(d_1__meter / d_0__meter) - (d_1__meter - d_0__meter) * term1));
 
             flag = A_ed__db > 0.0 || kHat_2 > 0.0;
 
@@ -266,7 +268,7 @@ int LongleyRice(
         *propmode = (int(delta__meter) == 0) ? MODE__DIFFRACTION_SINGLE_HORIZON : MODE__DIFFRACTION_DOUBLE_HORIZON;
 
     // Don't allow a negative loss.
-    *A_ref__db = MAX(*A_ref__db, 0.0);
+    *A_ref__db = std::max(*A_ref__db, 0.0);
 
     return SUCCESS;
 }

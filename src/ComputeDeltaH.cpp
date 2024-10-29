@@ -7,11 +7,13 @@ irregularity parameter, delta_h, in meters.
 
 /* Standard includes. */
 #include <algorithm>
-#include <vector>
 #include <cmath>
+#include <vector>
+#include <utility>
 
 /* Local includes. */
 #include "./include/ilm.h"
+
 
 /**
 * @brief
@@ -51,7 +53,7 @@ double ComputeDeltaH(
 
     // 10% index.
     int p10 = (int)(0.1 * (x_end - x_start + 8.0));
-    p10 = MIN(MAX(4, p10), 25);
+    p10 = std::min(std::max(4, p10), 25);
 
     int n = 10 * p10 - 5;
     // 90% index.
