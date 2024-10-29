@@ -1,25 +1,42 @@
+/**
+@file
+
+This file contains the LinearLeastSquaresFit() function.
+*/
+
 /* Standard includes. */
 #include <cmath>
 
 /* Local includes. */
 #include "../include/ilm.h"
 
-/*=============================================================================
- |
- |  Description:  Perform a linear least squares fit to the terrain data
- |
- |        Input:  pfl[2]         - Input data array, in pfl format
- |                d_start        - Start distance
- |                d_end          - End distance
- |
- |      Outputs:  fit_y1         - Fitted y1 value
- |                fit_y2         - Fitted y2 value
- |
- |      Returns:  [None]
- |
- *===========================================================================*/
-void LinearLeastSquaresFit(double pfl[], double d_start, double d_end, double *fit_y1, double *fit_y2)
-{
+/**
+@brief
+Perform a linear least squares fit to the terrain data.
+
+@param[in] pfl
+Input data array, in pfl format.
+
+@param[in] d_start
+Start distance.
+
+@param[in] d_end
+End distance.
+
+@param[out] fit_y1
+Fitted y1 value.
+
+@param[out] fit_y2
+Fitted y2 value.
+
+*/
+void LinearLeastSquaresFit(
+    double pfl[],
+    double d_start,
+    double d_end,
+    double *fit_y1,
+    double *fit_y2
+) {
     int np = (int)pfl[0];
 
     int i_start = int(fdim(d_start / pfl[1], 0.0));

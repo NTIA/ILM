@@ -1,26 +1,34 @@
+/**
+@file
+
+This file contains the InverseComplementaryCumulativeDistributionFunction().
+*/
+
 /* Standard includes. */
 #include <cmath>
 
 /* Local includes. */
 #include "../include/ilm.h"
 
-/*=============================================================================
- |
- |  Description:  This function computes the inverse complementary
- |                cumulative distribution function approximation as
- |                described in Formula 26.2.23 in Abramowitz & Stegun.
- |                This approximation has an error of 
- |                abs(epsilon(p)) < 4.5e-4
- |
- |        Input:  q              - Quantile, 0.0 < q < 1.0
- |
- |      Outputs:  [None]
- |
- |      Returns:  Q_q            - Q(q)^-1
- |
- *===========================================================================*/
-double InverseComplementaryCumulativeDistributionFunction(double q)
-{
+/**
+@brief
+Return the inverse complementary cumulative distribution function.
+
+This function computes the inverse complementary cumulative distribution
+function approximation as described in Formula 26.2.23 in Abramowitz & Stegun.
+
+This approximation has an error of abs(epsilon(p)) < 4.5E-4.
+
+@param[in] q
+Quantile, 0.0 < q < 1.0.
+
+@return Q_q
+Q(q)^-1.
+
+*/
+double InverseComplementaryCumulativeDistributionFunction(
+    double q
+) {
     double C_0 = 2.515516;
     double C_1 = 0.802853;
     double C_2 = 0.010328;

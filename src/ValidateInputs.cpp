@@ -1,33 +1,59 @@
+/**
+@file
+
+This file contains the ValidateInputs() function.
+*/
+
 /* Local includes. */
 #include "../include/ilm.h"
 #include "../include/Enums.h"
 #include "../include/Errors.h"
 #include "../include/Warnings.h"
 
-/*=============================================================================
- |
- |  Description:  Perform input parameter validation.  This function only
- |                applies to the set of variables common to both ILM
- |                point-to-point mode and area mode.
- |
- |        Input:  h_tx__meter    - Structural height of the TX, in meters
- |				  h_rx__meter    - Structural height of the RX, in meters
- |                p              - Location percentage, 0 < p < 100
- |                f__mhz         - Frequency, in MHz
- |                pol            - Polarization
- |                                      + 0 : POLARIZATION__HORIZONTAL
- |                                      + 1 : POLARIZATION__VERTICAL
- |                epsilon        - Relative permittivity
- |                sigma          - Conductivity
- |
- |      Outputs:  warnings       - Warning messages
- |
- |      Returns:  [None]
- |
- *===========================================================================*/
-int ValidateInputs(double h_tx__meter, double h_rx__meter, double p, 
-    double f__mhz, int pol, double epsilon, double sigma, long *warnings)
-{
+/**
+@brief
+Perform input parameter validation.
+
+This function only applies to the set of variables common to both ILM
+point-to-point mode and area mode.
+
+@param[in] h_tx__meter
+Structural height of the TX, in meters.
+
+@param[in] h_rx__meter
+Structural height of the RX, in meters.
+
+@param[in] p
+Location percentage, 0 < p < 100.
+
+@param[in] f__mhz
+Frequency, in MHz.
+
+@param[in] pol
+Polarization
+    0: POLARIZATION__HORIZONTAL
+    1: POLARIZATION__VERTICAL
+
+@param[in] epsilon
+Relative permittivity.
+
+@param[in] sigma
+Conductivity.
+
+@param[out] warnings
+Warning messages.
+
+*/
+int ValidateInputs(
+    double h_tx__meter,
+    double h_rx__meter,
+    double p,
+    double f__mhz,
+    int pol,
+    double epsilon,
+    double sigma,
+    long *warnings
+) {
     if (h_tx__meter < 1.0 || h_tx__meter > 1000.0)
         *warnings |= WARN__TX_TERMINAL_HEIGHT;
 

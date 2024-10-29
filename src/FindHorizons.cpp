@@ -1,27 +1,46 @@
+/**
+@file
+
+This file contains the function FindHorizons() to calculate the terminal radio
+horizon angles and distances.
+*/
+
 /* Local includes. */
 #include "../include/ilm.h"
 
-/*=============================================================================
- |
- |  Description:  Compute the radio horizon's of the terminals
- |
- |        Input:  pfl[]             - Terrain data
- |                h__meter[2]       - Terminal structural heights, in meters
- |
- |      Outputs:  theta_hzn[2]      - Terminal radio horizon angle, in radians
- |                d_hzn__meter[2]   - Terminal radio horizon distance, in meters
- |
- |      Returns:  [None]
- |
- *===========================================================================*/
-void FindHorizons(double pfl[], double h__meter[2], double theta_hzn[2], double d_hzn__meter[2])
-{
+/**
+@brief
+Compute the terminals' radio horizon angle and distance.
+
+@param[in] pfl[]
+Terrain data.
+
+@param[in] h__meter
+Terminal structural heights, in meters.
+
+@param[out] theta_hzn
+Terminal radio horizon angle, in radians.
+
+@param[out] d_hzn__meter
+Terminal radio horizon distance, in meters.
+
+*/
+void FindHorizons(
+    double pfl[],
+    double h__meter[2],
+    double theta_hzn[2],
+    double d_hzn__meter[2]
+) {
     int np = int(pfl[0]);
     double xi = pfl[1];
 
     double d__meter = pfl[0] * pfl[1];
 
-    // compute radials (ignore radius of moon since it cancels out in the later math)
+    /*
+    Compute radials.
+    Ignore radius of moon since it cancels out in the later math.
+    */
+
     double z_tx__meter = pfl[2] + h__meter[0];
     double z_rx__meter = pfl[np + 2] + h__meter[1];
 

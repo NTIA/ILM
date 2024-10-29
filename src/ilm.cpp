@@ -1,10 +1,7 @@
 /**
 @file
 
-@brief
-This file contains functions to return the version and compile time of ITM.dll.
-
-@author
+This file contains functions to return the version and compile time of ILM.dll.
 */
 
 /* Local includes. */
