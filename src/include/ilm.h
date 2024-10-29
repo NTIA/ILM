@@ -2,13 +2,10 @@
 /**
 @file
 
-@brief
 ITU-R SG3 Irregular Lunar Model (ILM).
 
 The ILM is a modification of the NTIA/ITS Irregular Terrain Model (ITM) to be
 applicable to the surface of the Earth's moon.
-
-@author
 */
 
 // ILM.dll header guard.
@@ -135,11 +132,11 @@ Visual Studio > Project > MKE Properties > C/C++ > Preprocessor
 #define ILM_API extern "C" __declspec(dllexport)
 #else
 #define ILM_API extern "C" __declspec(dllimport)
-#endif // ILM_DLL_EXPORT
+#endif  // ILM_DLL_EXPORT
 #else
 // Compiling with a non-Windows OS.
 #define ILM_API
-#endif // _WIN32
+#endif  // _WIN32
 
 /* Prototypes. */
 
