@@ -140,12 +140,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\include\Enums.h" />
-    <ClInclude Include="..\..\..\include\Errors.h" />
-    <ClInclude Include="..\..\..\include\ilm.h" />
-    <ClInclude Include="..\..\..\include\Warnings.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\..\src\ComputeDeltaH.cpp" />
     <ClCompile Include="..\..\..\src\DiffractionLoss.cpp" />
     <ClCompile Include="..\..\..\src\FindHorizons.cpp" />
@@ -167,6 +161,12 @@
     <ClCompile Include="..\..\..\src\TerrainRoughness.cpp" />
     <ClCompile Include="..\..\..\src\ValidateInputs.cpp" />
     <ClCompile Include="..\..\..\src\Variability.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\include\Enums.h" />
+    <ClInclude Include="..\..\..\src\include\Errors.h" />
+    <ClInclude Include="..\..\..\src\include\ilm.h" />
+    <ClInclude Include="..\..\..\src\include\Warnings.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
