@@ -29,14 +29,6 @@ ILM.dll compilation date and time.
 /* Usings. */
 using namespace std;
 
-/* Utility functions. */
-
-/**
-@brief
-Dim of x and y.
-*/
-#define DIM(x, y) (((x) > (y)) ? (x - y) : (0))
-
 /* Constants. */
 
 /**

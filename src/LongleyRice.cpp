@@ -17,6 +17,11 @@ This file contains the LongleyRice() function.
 #include "./include/ilm.h"
 #include "./include/Warnings.h"
 
+/**
+@brief
+Dim of x and y.
+*/
+#define DIM(x, y) (((x) > (y)) ? (x - y) : (0))
 
 /**
 @brief
