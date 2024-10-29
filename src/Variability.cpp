@@ -5,6 +5,7 @@ This file contains the Variability() function.
 */
 
 /* Standard includes. */
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 /* Local includes. */
@@ -40,11 +41,10 @@ double Variability(
     double d__meter,
     double A_ref__db
 ) {
-
     // Speed of light, m/s.
     double c = 299792458.0;
     // [RLS, A-1 & B-1].
-    double k = 2.0 * PI * (f__mhz * 1.0E6) / c;
+    double k = 2.0 * M_PI * (f__mhz * 1.0E6) / c;
 
     // [RLS, A-72 & B-70].
     double delta_h_d__meter = delta_h__meter * (1.0 - 0.8 * exp(-d__meter / 50.0E3));

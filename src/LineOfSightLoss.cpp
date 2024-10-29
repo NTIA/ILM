@@ -5,6 +5,7 @@ This file contains the LineOfSightLoss() function.
 */
 
 /* Standard includes. */
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <complex>
 
@@ -62,9 +63,9 @@ double LineOfSightLoss(
     double sigma_h_s__meter = (delta_h__meter / 1.282) * exp(-pow(delta_h__meter, 0.25) / 2.0);
 
     // Speed of light, m/s.
-    double c = 299792458;
+    double c = 299792458.0;
     // [RLS, A-1].
-    double k = 2 * PI * (f__mhz * 1e6) / c;
+    double k = 2 * M_PI * (f__mhz * 1E6) / c;
 
     // [RLS, A-65 & B-63].
     double sin_psi = (h_e__meter[0] + h_e__meter[1]) / sqrt(pow(s__meter, 2) + pow(h_e__meter[0] + h_e__meter[1], 2));
@@ -81,8 +82,8 @@ double LineOfSightLoss(
     double delta_phi = 2.0 * k * h_e__meter[0] * h_e__meter[1] / s__meter;
 
     // [RLS, A-70 & B-68].
-    if (delta_phi > PI / 2.0)
-        delta_phi = PI - pow(PI / 2.0, 2) / delta_phi;
+    if (delta_phi > M_PI / 2.0)
+        delta_phi = M_PI - pow(M_PI / 2.0, 2) / delta_phi;
 
     // [RLS, A-71 & B-69].
     complex<double> rr = complex<double>(cos(delta_phi), -sin(delta_phi)) + R_e;

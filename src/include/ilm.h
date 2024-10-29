@@ -49,17 +49,12 @@ Dim of x and y.
 #define DIM(x, y) (((x) > (y)) ? (x - y) : (0))
 
 /* Constants. */
-/**
-@brief
-The ratio of a circle's circumference to its diameter.
-*/
-#define PI 3.1415926535897932384
 
 /**
 @brief
 The radius of Earth's moon in meters.
 */
-#define a_m__meter 1737400
+#define a_m__meter 1737400.0
 
 /**
 @brief

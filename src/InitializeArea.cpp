@@ -5,6 +5,7 @@ This file contains the InitializeArea() function.
 */
 
 /* Standard includes. */
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 /* Local includes. */
@@ -54,12 +55,12 @@ void InitializeArea(
         else
         {
             // [RLS, A-5 & B-5].
-            double B = 10;
+            double B = 10.0;
 
             if (h__meter[i] < 5.0)
             {
                 // [RLS, A-6 & B-6].
-                B = (B - 1) * sin(0.1 * PI * h__meter[i]) + 1;
+                B = (B - 1.0) * sin(0.1 * M_PI * h__meter[i]) + 1.0;
             }
 
             // [RLS, A-7 & B-7].
@@ -70,7 +71,7 @@ void InitializeArea(
         double d_ls__meter = sqrt(2.0 * h_e__meter[i] * a_m__meter);
 
         // [RLS, A-9 & B-9].
-        d_l__meter[i] = d_ls__meter * exp(-0.07 * sqrt(delta_h__meter / MAX(h_e__meter[i], 5)));
+        d_l__meter[i] = d_ls__meter * exp(-0.07 * sqrt(delta_h__meter / MAX(h_e__meter[i], 5.0)));
 
         // [RLS, A-10 & B-10].
         theta_hzn[i] = -(2.0 * h_e__meter[i] + 0.65 * delta_h__meter * (d_ls__meter / d_l__meter[i] - 1.0)) / d_ls__meter;

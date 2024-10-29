@@ -5,6 +5,7 @@ This file contains the LongleyRice() function.
 */
 
 /* Standard includes. */
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <complex>
 #include <cstdlib>
@@ -111,9 +112,9 @@ int LongleyRice(
         return ERROR__GROUND_IMPEDANCE;
 
     // Speed of light, m/s.
-    double c = 299792458;
+    double c = 299792458.0;
     // [RLS, A-1 & B-1].
-    double k = 2 * PI * (f__mhz * 1e6) / c;
+    double k = 2 * M_PI * (f__mhz * 1E6) / c;
 
     // [RLS, A-20 & B-18].
     double X_ae__meter = pow(k / pow(a_m__meter, 2), -THIRD);
