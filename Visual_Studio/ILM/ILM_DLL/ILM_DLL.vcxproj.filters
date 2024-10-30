@@ -63,7 +63,7 @@
     <ClCompile Include="..\..\..\src\SigmaHFunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\SmoothMoonDiffraction.cpp">
+    <ClCompile Include="..\..\..\src\SmoothSphereDiffraction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\TerrainRoughness.cpp">

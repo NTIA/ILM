@@ -1,7 +1,7 @@
 /**
 @file
 
-This file contains the SmoothMoonDiffraction() and HeightFunction() functions.
+This file contains the SmoothSphereDiffraction() and HeightFunction() functions.
 */
 
 /* Standard includes. */
@@ -21,7 +21,13 @@ The ratio 1/3.
 
 /**
 @brief
-Compute the smooth earth diffraction loss using the Vogler 3-radii method.
+Compute the smooth sphere diffraction loss using the Vogler 3-radii method.
+
+@param[in] radius__meter
+Sphere's radius, in meters.
+Example values:
+    Earth's radius:
+    Moon's radius: 1737400.0 m
 
 @param[in] d__meter
 Path distance, in meters.
@@ -42,10 +48,11 @@ Effective terminal heights, in meters.
 Complex ground impedance.
 
 @return A_r__db
-Smooth-earth diffraction loss, in dB.
+Smooth-sphere diffraction loss, in dB.
 
 */
-double SmoothMoonDiffraction(
+double SmoothSphereDiffraction(
+    double radius__meter,
     double d__meter,
     double f__mhz,
     double theta_los,
@@ -62,14 +69,14 @@ double SmoothMoonDiffraction(
     double C_0[3];
 
     // [Algorithm, Eqn 4.12].
-    double theta_nlos = d__meter / a_m__meter - theta_los;
+    double theta_nlos = d__meter / radius__meter - theta_los;
     // Maximum line-of-sight distance for actual path.
     double d_ML__meter = d_hzn__meter[0] + d_hzn__meter[1];
 
     // [RLS, A-30b, rearranged]
     // Compute 3 radii
-    // Which is a_m__meter when theta_los = d_ML__meter / a_m__meter.
-    a__meter[0] = (d__meter - d_ML__meter) / (d__meter / a_m__meter - theta_los);
+    // Which is radius__meter when theta_los = d_ML__meter / radius__meter.
+    a__meter[0] = (d__meter - d_ML__meter) / (d__meter / radius__meter - theta_los);
     // Compute the radius of the effective earth for terminal j using
     // [Volger 1964, Eqn 3] re-arranged.
     a__meter[1] = 0.5 * pow(d_hzn__meter[0], 2) / h_e__meter[0];
@@ -85,7 +92,7 @@ double SmoothMoonDiffraction(
     for (int i = 0; i < 3; i++)
     {
         // C_0 = (4 / 3k) ^ (1 / 3) [Vogler 1964, Eqn 2].
-        C_0[i] = pow((4.0 / 3.0) * a_m__meter / a__meter[i], THIRD);
+        C_0[i] = pow((4.0 / 3.0) * radius__meter / a__meter[i], THIRD);
 
         // [Vogler 1964, Eqn 6a / 7a].
         K[i] = 0.017778 * C_0[i] * pow(f__mhz, -THIRD) / abs(Z_g);

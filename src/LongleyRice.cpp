@@ -129,6 +129,7 @@ int LongleyRice(
 
     // [RLS, A-18 & B-16].
     double A_3__db = DiffractionLoss(
+        a_m__meter,
         d_3__meter,
         d_hzn__meter,
         h_e__meter,
@@ -140,6 +141,7 @@ int LongleyRice(
     );
     // [RLS, A-19 & B-17].
     double A_4__db = DiffractionLoss(
+        a_m__meter,
         d_4__meter,
         d_hzn__meter,
         h_e__meter,

@@ -188,6 +188,7 @@ ILM_API double ComputeDeltaH(
 );
 
 ILM_API double DiffractionLoss(
+    double radius__meter,
     double d__meter,
     double d_hzn__meter[2],
     double h_e__meter[2],
@@ -294,7 +295,8 @@ ILM_API double SigmaHFunction(
     double delta_h__meter
 );
 
-ILM_API double SmoothMoonDiffraction(
+ILM_API double SmoothSphereDiffraction(
+    double radius__meter,
     double d__meter,
     double f__mhz,
     double theta_los,
