@@ -69,14 +69,16 @@ double SmoothSphereDiffraction(
     double C_0[3];
 
     // [Algorithm, Eqn 4.12].
-    double theta_nlos = d__meter / radius__meter - theta_los;
+    // double theta_nlos = d__meter / radius__meter - theta_los;
+    double theta_nlos = d__meter / radius__meter + theta_los; // RM change
     // Maximum line-of-sight distance for actual path.
     double d_ML__meter = d_hzn__meter[0] + d_hzn__meter[1];
 
     // [RLS, A-30b, rearranged]
-    // Compute 3 radii
+    // Compute 3 radii.
     // Which is radius__meter when theta_los = d_ML__meter / radius__meter.
-    a__meter[0] = (d__meter - d_ML__meter) / (d__meter / radius__meter - theta_los);
+    // a__meter[0] = (d__meter - d_ML__meter) / (d__meter / radius__meter - theta_los);
+    a__meter[0] = (d__meter - d_ML__meter) / theta_nlos; // RM change ( this is just a simplification via (73) )
     // Compute the radius of the effective earth for terminal j using
     // [Volger 1964, Eqn 3] re-arranged.
     a__meter[1] = 0.5 * pow(d_hzn__meter[0], 2) / h_e__meter[0];
