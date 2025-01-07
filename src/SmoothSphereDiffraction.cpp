@@ -74,8 +74,8 @@ double SmoothSphereDiffraction(
     // Maximum line-of-sight distance for actual path.
     double d_ML__meter = d_hzn__meter[0] + d_hzn__meter[1];
 
-    // [RLS, A-30b, rearranged]
     // Compute 3 radii.
+    // [RLS, A-30a, rearranged]
     // Which is radius__meter when theta_los = d_ML__meter / radius__meter.
     // a__meter[0] = (d__meter - d_ML__meter) / (d__meter / radius__meter - theta_los);
     a__meter[0] = (d__meter - d_ML__meter) / theta_nlos; // RM change ( this is just a simplification via (73) )

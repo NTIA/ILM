@@ -94,6 +94,9 @@ int LongleyRice(
     // [RLS, A-12].
     double d_l__meter = d_hzn__meter[0] + d_hzn__meter[1];
 
+    // [RLS, A-13].
+    const double theta_los = std::max(theta_hzn[0] + theta_hzn[1], -d_l__meter / a_m__meter);
+
     // Check validity of small angle approximation.
     if (abs(theta_hzn[0]) > 200.0E-3)
         *warnings |= WARN__TX_HORIZON_ANGLE;
@@ -136,7 +139,7 @@ int LongleyRice(
         Z_g,
         delta_h__meter,
         h__meter,
-        d_ls__meter,
+        theta_los,
         f__mhz
     );
     // [RLS, A-19 & B-17].
@@ -148,7 +151,7 @@ int LongleyRice(
         Z_g,
         delta_h__meter,
         h__meter,
-        d_ls__meter,
+        theta_los,
         f__mhz
     );
 
