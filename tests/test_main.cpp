@@ -4,6 +4,17 @@
 #include "Errors.h"     // For error constants
 #include "Warnings.h"   // For warning constants
 
+ #define APPROVALS_GOOGLETEST
+#include "ApprovalTests.v.10.13.0.hpp"  // ApprovalTests framework
+
+#include <fstream>      // For file I/O
+#include <sstream>      // For string stream
+#include <string>       // For string operations
+#include <vector>       // For vector container
+#include <iostream>     // For console output
+#include <algorithm>    // For min/max functions
+#include <iomanip>      // For formatting output
+
 // Example test case
 TEST(ILMTest, Test_ILM_Version) 
 {
@@ -307,6 +318,751 @@ TEST_F(ValidateInputsTest, BoundaryValues_Success) {
     EXPECT_EQ(warnings & WARN__RX_TERMINAL_HEIGHT, 0);
     EXPECT_EQ(warnings & WARN__FREQUENCY, 0);
 }
+
+// ===================== PointToPoint_Ex Tests =====================
+
+// Helper structure to hold test parameters from CSV
+struct P2PTestCase {
+    double h_tx__meter;
+    double h_rx__meter;
+    double f__mhz;
+    int pol;
+    double epsilon;
+    double sigma;
+    double p;
+};
+
+// Helper structure to hold PFL data
+struct PFLData {
+    std::vector<double> pfl;
+    bool isValid;
+};
+
+// Helper functions for reading CSV files
+class CSVReader {
+public:
+    static std::vector<P2PTestCase> readP2PTestCases(const std::string& filename) {
+        std::vector<P2PTestCase> testCases;
+        std::ifstream file(filename);
+        std::string line;
+        
+        // Skip header line
+        if (std::getline(file, line)) {
+            while (std::getline(file, line)) {
+                if (line.empty()) continue;
+                
+                P2PTestCase testCase;
+                std::stringstream ss(line);
+                std::string cell;
+                
+                // Parse CSV: h_tx__meter,h_rx__meter,f__mhz,pol,epsilon,sigma,p
+                if (std::getline(ss, cell, ',')) testCase.h_tx__meter = std::stod(cell);
+                if (std::getline(ss, cell, ',')) testCase.h_rx__meter = std::stod(cell);
+                if (std::getline(ss, cell, ',')) testCase.f__mhz = std::stod(cell);
+                if (std::getline(ss, cell, ',')) testCase.pol = std::stoi(cell);
+                if (std::getline(ss, cell, ',')) testCase.epsilon = std::stod(cell);
+                if (std::getline(ss, cell, ',')) testCase.sigma = std::stod(cell);
+                if (std::getline(ss, cell, ',')) testCase.p = std::stod(cell);
+                
+                testCases.push_back(testCase);
+            }
+        }
+        file.close();
+        return testCases;
+    }
+    
+    static std::vector<PFLData> readPFLData(const std::string& filename) {
+        std::vector<PFLData> pflDataList;
+        std::ifstream file(filename);
+        std::string line;
+        
+        while (std::getline(file, line)) {
+            if (line.empty()) continue;
+            
+            PFLData pflData;
+            pflData.isValid = true;
+            
+            std::stringstream ss(line);
+            std::string cell;
+            
+            // First two numbers are special: number of points and distance increment
+            if (std::getline(ss, cell, ',')) {
+                double numPoints = std::stod(cell);
+                pflData.pfl.push_back(numPoints);
+            } else {
+                pflData.isValid = false;
+                continue;
+            }
+            
+            if (std::getline(ss, cell, ',')) {
+                double increment = std::stod(cell);
+                pflData.pfl.push_back(increment);
+            } else {
+                pflData.isValid = false;
+                continue;
+            }
+            
+            // Read all elevation points
+            while (std::getline(ss, cell, ',')) {
+                if (!cell.empty()) {
+                    pflData.pfl.push_back(std::stod(cell));
+                }
+            }
+            
+            pflDataList.push_back(pflData);
+        }
+        file.close();
+        return pflDataList;
+    }
+};
+
+// PointToPoint_Ex test fixture
+class PointToPointExTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        // Get paths to test data files - try multiple possible locations
+        std::vector<std::string> possiblePaths = {
+            "tests/",           // Relative to build directory
+            "../tests/",        // One level up from build
+            "../../tests/",     // Two levels up from build/Debug
+            "./tests/"          // Current directory
+        };
+        
+        bool foundData = false;
+        for (const auto& path : possiblePaths) {
+            testCases = CSVReader::readP2PTestCases(path + "p2p.csv");
+            pflDataList = CSVReader::readPFLData(path + "pfls.csv");
+            
+            if (!testCases.empty() && !pflDataList.empty()) {
+                testDataPath = path;
+                foundData = true;
+                break;
+            }
+        }
+        
+        // Verify we loaded data successfully
+        ASSERT_TRUE(foundData) << "Failed to load test data from any of the expected locations";
+        ASSERT_FALSE(testCases.empty()) << "Failed to load test cases from p2p.csv";
+        ASSERT_FALSE(pflDataList.empty()) << "Failed to load PFL data from pfls.csv";
+        
+        std::cout << "Loaded " << testCases.size() << " test cases and " 
+                  << pflDataList.size() << " PFL datasets from " << testDataPath << std::endl;
+    }
+    
+    std::string testDataPath;
+    std::vector<P2PTestCase> testCases;
+    std::vector<PFLData> pflDataList;
+};
+
+// Test basic functionality with first test case
+TEST_F(PointToPointExTest, BasicFunctionality_FirstTestCase) {
+    ASSERT_FALSE(testCases.empty());
+    ASSERT_FALSE(pflDataList.empty());
+    ASSERT_TRUE(pflDataList[0].isValid);
+    
+    const P2PTestCase& testCase = testCases[0];
+    const PFLData& pflData = pflDataList[0];
+    
+    double A_db = 0.0;
+    long warnings = 0;
+    IntermediateValues interValues;
+    
+    int result = PointToPoint_Ex(
+        testCase.h_tx__meter,
+        testCase.h_rx__meter,
+        const_cast<double*>(pflData.pfl.data()),
+        testCase.f__mhz,
+        testCase.pol,
+        testCase.epsilon,
+        testCase.sigma,
+        testCase.p,
+        &A_db,
+        &warnings,
+        &interValues
+    );
+    
+    // Basic validation
+    EXPECT_TRUE(result == SUCCESS || result == SUCCESS_WITH_WARNINGS);
+    EXPECT_GT(A_db, 0.0) << "Transmission loss should be positive";
+    EXPECT_LT(A_db, 500.0) << "Transmission loss should be reasonable (< 500 dB)";
+    
+    // Check intermediate values are populated
+    EXPECT_GT(interValues.d__km, 0.0) << "Distance should be positive";
+    EXPECT_GT(interValues.A_fs__db, 0.0) << "Free space loss should be positive";
+    EXPECT_GE(interValues.A_ref__db, 0.0) << "Reference attenuation should be non-negative";
+    
+    // Validate horizon data
+    EXPECT_GE(interValues.d_hzn__meter[0], 0.0) << "TX horizon distance should be non-negative";
+    EXPECT_GE(interValues.d_hzn__meter[1], 0.0) << "RX horizon distance should be non-negative";
+    EXPECT_GE(interValues.h_e__meter[0], 0.0) << "TX effective height should be non-negative";
+    EXPECT_GE(interValues.h_e__meter[1], 0.0) << "RX effective height should be non-negative";
+}
+
+// Test all provided test cases
+TEST_F(PointToPointExTest, AllTestCases_ValidResults) {
+    // Ensure we have matching test cases and PFL data
+    size_t maxTests = std::min(testCases.size(), pflDataList.size());
+    ASSERT_GT(maxTests, 0) << "No valid test cases found";
+    
+    for (size_t i = 0; i < maxTests; ++i) {
+        const P2PTestCase& testCase = testCases[i];
+        const PFLData& pflData = pflDataList[i];
+        
+        // Skip invalid PFL data
+        if (!pflData.isValid) {
+            GTEST_SKIP() << "Skipping test case " << i << " due to invalid PFL data";
+            continue;
+        }
+        
+        double A_db = 0.0;
+        long warnings = 0;
+        IntermediateValues interValues;
+        
+        int result = PointToPoint_Ex(
+            testCase.h_tx__meter,
+            testCase.h_rx__meter,
+            const_cast<double*>(pflData.pfl.data()),
+            testCase.f__mhz,
+            testCase.pol,
+            testCase.epsilon,
+            testCase.sigma,
+            testCase.p,
+            &A_db,
+            &warnings,
+            &interValues
+        );
+        
+        // Test should succeed or succeed with warnings
+        EXPECT_TRUE(result == SUCCESS || result == SUCCESS_WITH_WARNINGS) 
+            << "Test case " << i << " failed with error code: " << result;
+        
+        // Basic sanity checks on results
+        EXPECT_GT(A_db, 0.0) << "Test case " << i << ": Transmission loss should be positive";
+        EXPECT_LT(A_db, 1000.0) << "Test case " << i << ": Transmission loss should be reasonable";
+        EXPECT_GT(interValues.d__km, 0.0) << "Test case " << i << ": Distance should be positive";
+        
+        // Log results for debugging
+        std::cout << "Test case " << i << ": "
+                  << "A_db=" << A_db 
+                  << ", d_km=" << interValues.d__km
+                  << ", warnings=0x" << std::hex << warnings << std::dec
+                  << ", mode=" << interValues.mode << std::endl;
+    }
+}
+
+// Test error conditions with invalid inputs
+TEST_F(PointToPointExTest, InvalidInputs_ErrorHandling) {
+    ASSERT_FALSE(pflDataList.empty());
+    ASSERT_TRUE(pflDataList[0].isValid);
+    
+    const PFLData& pflData = pflDataList[0];
+    double A_db = 0.0;
+    long warnings = 0;
+    IntermediateValues interValues;
+    
+    // Test with invalid frequency (too low)
+    int result = PointToPoint_Ex(
+        10.0,   // h_tx
+        2.0,    // h_rx
+        const_cast<double*>(pflData.pfl.data()),
+        15.0,   // f_mhz - too low (should be >= 20)
+        POLARIZATION__HORIZONTAL,
+        15.0,   // epsilon
+        0.008,  // sigma
+        50.0,   // p
+        &A_db,
+        &warnings,
+        &interValues
+    );
+    
+    EXPECT_EQ(result, ERROR__FREQUENCY);
+    
+    // Test with invalid polarization
+    result = PointToPoint_Ex(
+        10.0,   // h_tx
+        2.0,    // h_rx
+        const_cast<double*>(pflData.pfl.data()),
+        1000.0, // f_mhz
+        99,     // pol - invalid
+        15.0,   // epsilon
+        0.008,  // sigma
+        50.0,   // p
+        &A_db,
+        &warnings,
+        &interValues
+    );
+    
+    EXPECT_EQ(result, ERROR__POLARIZATION);
+    
+    // Test with invalid percentage
+    result = PointToPoint_Ex(
+        10.0,   // h_tx
+        2.0,    // h_rx
+        const_cast<double*>(pflData.pfl.data()),
+        1000.0, // f_mhz
+        POLARIZATION__HORIZONTAL,
+        15.0,   // epsilon
+        0.008,  // sigma
+        150.0,  // p - too high (should be < 100)
+        &A_db,
+        &warnings,
+        &interValues
+    );
+    
+    EXPECT_EQ(result, ERROR__INVALID_PERCENTAGE);
+}
+
+// Test warning conditions
+TEST_F(PointToPointExTest, WarningConditions_SuccessWithWarnings) {
+    ASSERT_FALSE(pflDataList.empty());
+    ASSERT_TRUE(pflDataList[0].isValid);
+    
+    const PFLData& pflData = pflDataList[0];
+    double A_db = 0.0;
+    long warnings = 0;
+    IntermediateValues interValues;
+    
+    // Test with parameters that should generate warnings
+    int result = PointToPoint_Ex(
+        0.8,    // h_tx - below warning threshold (< 1.0)
+        1200.0, // h_rx - above warning threshold (> 1000.0)
+        const_cast<double*>(pflData.pfl.data()),
+        35.0,   // f_mhz - below warning threshold (< 40.0)
+        POLARIZATION__VERTICAL,
+        15.0,   // epsilon
+        0.008,  // sigma
+        50.0,   // p
+        &A_db,
+        &warnings,
+        &interValues
+    );
+    
+    EXPECT_EQ(result, SUCCESS_WITH_WARNINGS);
+    EXPECT_NE(warnings & WARN__TX_TERMINAL_HEIGHT, 0);
+    EXPECT_NE(warnings & WARN__RX_TERMINAL_HEIGHT, 0);
+    EXPECT_NE(warnings & WARN__FREQUENCY, 0);
+    EXPECT_GT(A_db, 0.0);
+}
+
+// Test different polarizations
+TEST_F(PointToPointExTest, DifferentPolarizations_ValidResults) {
+    ASSERT_FALSE(testCases.empty());
+    ASSERT_FALSE(pflDataList.empty());
+    ASSERT_TRUE(pflDataList[0].isValid);
+    
+    const P2PTestCase& baseCase = testCases[0];
+    const PFLData& pflData = pflDataList[0];
+    
+    // Test horizontal polarization
+    double A_db_horizontal = 0.0;
+    long warnings_h = 0;
+    IntermediateValues interValues_h;
+    
+    int result_h = PointToPoint_Ex(
+        baseCase.h_tx__meter,
+        baseCase.h_rx__meter,
+        const_cast<double*>(pflData.pfl.data()),
+        baseCase.f__mhz,
+        POLARIZATION__HORIZONTAL,
+        baseCase.epsilon,
+        baseCase.sigma,
+        baseCase.p,
+        &A_db_horizontal,
+        &warnings_h,
+        &interValues_h
+    );
+    
+    // Test vertical polarization
+    double A_db_vertical = 0.0;
+    long warnings_v = 0;
+    IntermediateValues interValues_v;
+    
+    int result_v = PointToPoint_Ex(
+        baseCase.h_tx__meter,
+        baseCase.h_rx__meter,
+        const_cast<double*>(pflData.pfl.data()),
+        baseCase.f__mhz,
+        POLARIZATION__VERTICAL,
+        baseCase.epsilon,
+        baseCase.sigma,
+        baseCase.p,
+        &A_db_vertical,
+        &warnings_v,
+        &interValues_v
+    );
+    
+    // Both should succeed
+    EXPECT_TRUE(result_h == SUCCESS || result_h == SUCCESS_WITH_WARNINGS);
+    EXPECT_TRUE(result_v == SUCCESS || result_v == SUCCESS_WITH_WARNINGS);
+    
+    // Both should produce valid results
+    EXPECT_GT(A_db_horizontal, 0.0);
+    EXPECT_GT(A_db_vertical, 0.0);
+    
+    // Results might differ due to polarization effects
+    std::cout << "Horizontal polarization: A_db = " << A_db_horizontal 
+              << ", Vertical polarization: A_db = " << A_db_vertical << std::endl;
+}
+
+// Test intermediate values consistency
+TEST_F(PointToPointExTest, IntermediateValues_Consistency) {
+    ASSERT_FALSE(testCases.empty());
+    ASSERT_FALSE(pflDataList.empty());
+    ASSERT_TRUE(pflDataList[0].isValid);
+    
+    const P2PTestCase& testCase = testCases[0];
+    const PFLData& pflData = pflDataList[0];
+    
+    double A_db = 0.0;
+    long warnings = 0;
+    IntermediateValues interValues;
+    
+    int result = PointToPoint_Ex(
+        testCase.h_tx__meter,
+        testCase.h_rx__meter,
+        const_cast<double*>(pflData.pfl.data()),
+        testCase.f__mhz,
+        testCase.pol,
+        testCase.epsilon,
+        testCase.sigma,
+        testCase.p,
+        &A_db,
+        &warnings,
+        &interValues
+    );
+    
+    EXPECT_TRUE(result == SUCCESS || result == SUCCESS_WITH_WARNINGS);
+    
+    // Verify intermediate values consistency
+    EXPECT_GT(interValues.d__km, 0.0);
+    EXPECT_GT(interValues.A_fs__db, 0.0);
+    
+    // Free space loss should be less than total loss (in most cases)
+    EXPECT_LE(interValues.A_fs__db, A_db + 50.0) << "Free space loss should be reasonable compared to total loss";
+    
+    // Distance should match PFL data
+    double expected_distance_km = pflData.pfl[0] * pflData.pfl[1] / 1000.0;
+    EXPECT_DOUBLE_EQ(interValues.d__km, expected_distance_km) << "Distance should match PFL calculation";
+    
+    // Propagation mode should be valid
+    EXPECT_GE(interValues.mode, MODE__NOT_SET);
+    EXPECT_NE(interValues.mode, MODE__NOT_SET) << "Propagation mode should be determined";
+    
+    // Horizon angles should be reasonable (in radians, typically small)
+    EXPECT_GE(interValues.theta_hzn[0], -0.5) << "TX horizon angle should be reasonable";
+    EXPECT_LE(interValues.theta_hzn[0], 0.5) << "TX horizon angle should be reasonable";
+    EXPECT_GE(interValues.theta_hzn[1], -0.5) << "RX horizon angle should be reasonable";
+    EXPECT_LE(interValues.theta_hzn[1], 0.5) << "RX horizon angle should be reasonable";
+}
+
+// ===================== Approval Tests =====================
+
+// Helper function to format test results for approval testing
+std::string formatPointToPointResults(const P2PTestCase& testCase, 
+                                    const PFLData& pflData, 
+                                    size_t testIndex) {
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(6);
+    
+    ss << "Test Case " << testIndex << ":\n";
+    ss << "  Input Parameters:\n";
+    ss << "    h_tx (m):     " << testCase.h_tx__meter << "\n";
+    ss << "    h_rx (m):     " << testCase.h_rx__meter << "\n";
+    ss << "    f (MHz):      " << testCase.f__mhz << "\n";
+    ss << "    pol:          " << testCase.pol << " (" 
+       << (testCase.pol == POLARIZATION__HORIZONTAL ? "Horizontal" : "Vertical") << ")\n";
+    ss << "    epsilon:      " << testCase.epsilon << "\n";
+    ss << "    sigma:        " << testCase.sigma << "\n";
+    ss << "    p (%):        " << testCase.p << "\n";
+    
+    // Skip invalid PFL data
+    if (!pflData.isValid) {
+        ss << "  Result:         SKIPPED (Invalid PFL data)\n";
+        return ss.str();
+    }
+    
+    ss << "  PFL Data:\n";
+    ss << "    Points:       " << (int)pflData.pfl[0] << "\n";
+    ss << "    Increment:    " << pflData.pfl[1] << " m\n";
+    ss << "    Total Dist:   " << (pflData.pfl[0] * pflData.pfl[1] / 1000.0) << " km\n";
+    
+    double A_db = 0.0;
+    long warnings = 0;
+    IntermediateValues interValues;
+    
+    int result = PointToPoint_Ex(
+        testCase.h_tx__meter,
+        testCase.h_rx__meter,
+        const_cast<double*>(pflData.pfl.data()),
+        testCase.f__mhz,
+        testCase.pol,
+        testCase.epsilon,
+        testCase.sigma,
+        testCase.p,
+        &A_db,
+        &warnings,
+        &interValues
+    );
+    
+    ss << "  Results:\n";
+    ss << "    Return Code:  " << result;
+    
+    if (result == SUCCESS) {
+        ss << " (SUCCESS)\n";
+    } else if (result == SUCCESS_WITH_WARNINGS) {
+        ss << " (SUCCESS_WITH_WARNINGS)\n";
+    } else {
+        ss << " (ERROR)\n";
+    }
+    
+    if (result == SUCCESS || result == SUCCESS_WITH_WARNINGS) {
+        ss << "    A_db:         " << A_db << " dB\n";
+        ss << "    Warnings:     0x" << std::hex << warnings << std::dec << "\n";
+        
+        ss << "  Intermediate Values:\n";
+        ss << "    d_km:         " << interValues.d__km << " km\n";
+        ss << "    A_fs_db:      " << interValues.A_fs__db << " dB\n";
+        ss << "    A_ref_db:     " << interValues.A_ref__db << " dB\n";
+        ss << "    delta_h:      " << interValues.delta_h__meter << " m\n";
+        ss << "    mode:         " << interValues.mode << "\n";
+        
+        ss << "  Horizon Data:\n";
+        ss << "    TX theta:     " << interValues.theta_hzn[0] << " rad\n";
+        ss << "    RX theta:     " << interValues.theta_hzn[1] << " rad\n";
+        ss << "    TX d_hzn:     " << interValues.d_hzn__meter[0] << " m\n";
+        ss << "    RX d_hzn:     " << interValues.d_hzn__meter[1] << " m\n";
+        ss << "    TX h_e:       " << interValues.h_e__meter[0] << " m\n";
+        ss << "    RX h_e:       " << interValues.h_e__meter[1] << " m\n";
+        
+        // Decode warnings if present
+        if (warnings != 0) {
+            ss << "  Warning Details:\n";
+            if (warnings & WARN__TX_TERMINAL_HEIGHT) 
+                ss << "    - TX height near limits\n";
+            if (warnings & WARN__RX_TERMINAL_HEIGHT) 
+                ss << "    - RX height near limits\n";
+            if (warnings & WARN__FREQUENCY) 
+                ss << "    - Frequency near limits\n";
+            if (warnings & WARN__PATH_DISTANCE_TOO_BIG_1) 
+                ss << "    - Path distance near upper limit\n";
+            if (warnings & WARN__PATH_DISTANCE_TOO_BIG_2) 
+                ss << "    - Path distance large\n";
+            if (warnings & WARN__PATH_DISTANCE_TOO_SMALL_1) 
+                ss << "    - Path distance near lower limit\n";
+            if (warnings & WARN__PATH_DISTANCE_TOO_SMALL_2) 
+                ss << "    - Path distance small\n";
+            if (warnings & WARN__TX_HORIZON_ANGLE) 
+                ss << "    - TX horizon angle large\n";
+            if (warnings & WARN__RX_HORIZON_ANGLE) 
+                ss << "    - RX horizon angle large\n";
+            if (warnings & WARN__TX_HORIZON_DISTANCE_1) 
+                ss << "    - TX horizon distance < 1/10 smooth earth\n";
+            if (warnings & WARN__RX_HORIZON_DISTANCE_1) 
+                ss << "    - RX horizon distance < 1/10 smooth earth\n";
+            if (warnings & WARN__TX_HORIZON_DISTANCE_2) 
+                ss << "    - TX horizon distance > 3x smooth earth\n";
+            if (warnings & WARN__RX_HORIZON_DISTANCE_2) 
+                ss << "    - RX horizon distance > 3x smooth earth\n";
+        }
+    } else {
+        // Decode error codes
+        ss << "  Error Details:\n";
+        switch (result) {
+            case ERROR__TX_TERMINAL_HEIGHT:
+                ss << "    - TX terminal height out of range\n";
+                break;
+            case ERROR__RX_TERMINAL_HEIGHT:
+                ss << "    - RX terminal height out of range\n";
+                break;
+            case ERROR__FREQUENCY:
+                ss << "    - Frequency out of range\n";
+                break;
+            case ERROR__POLARIZATION:
+                ss << "    - Invalid polarization\n";
+                break;
+            case ERROR__EPSILON:
+                ss << "    - Epsilon out of range\n";
+                break;
+            case ERROR__SIGMA:
+                ss << "    - Sigma out of range\n";
+                break;
+            case ERROR__INVALID_PERCENTAGE:
+                ss << "    - Invalid percentage\n";
+                break;
+            default:
+                ss << "    - Unknown error code: " << result << "\n";
+                break;
+        }
+    }
+    
+    return ss.str();
+}
+
+// Approval test using the official ApprovalTests framework
+TEST_F(PointToPointExTest, ApprovalTest_AllResults) {
+    // Ensure we have matching test cases and PFL data
+    size_t maxTests = std::min(testCases.size(), pflDataList.size());
+    ASSERT_GT(maxTests, 0) << "No valid test cases found for approval test";
+    
+    std::stringstream allResults;
+    allResults << "ILM PointToPoint_Ex Approval Test Results\n";
+    allResults << "Generated on: October 22, 2025\n";
+    allResults << "Test Cases: " << maxTests << "\n";
+    allResults << "========================================\n\n";
+    
+    int successCount = 0;
+    int warningCount = 0;
+    int errorCount = 0;
+    
+    for (size_t i = 0; i < maxTests; ++i) {
+        const P2PTestCase& testCase = testCases[i];
+        const PFLData& pflData = pflDataList[i];
+        
+        allResults << formatPointToPointResults(testCase, pflData, i);
+        allResults << "\n";
+        
+        // Count results for summary
+        if (pflData.isValid) {
+            double A_db = 0.0;
+            long warnings = 0;
+            IntermediateValues interValues;
+            
+            int result = PointToPoint_Ex(
+                testCase.h_tx__meter,
+                testCase.h_rx__meter,
+                const_cast<double*>(pflData.pfl.data()),
+                testCase.f__mhz,
+                testCase.pol,
+                testCase.epsilon,
+                testCase.sigma,
+                testCase.p,
+                &A_db,
+                &warnings,
+                &interValues
+            );
+            
+            if (result == SUCCESS) {
+                successCount++;
+            } else if (result == SUCCESS_WITH_WARNINGS) {
+                warningCount++;
+            } else {
+                errorCount++;
+            }
+        }
+    }
+    
+    // Add summary
+    allResults << "========================================\n";
+    allResults << "Summary:\n";
+    allResults << "  Total Tests:  " << maxTests << "\n";
+    allResults << "  Success:      " << successCount << "\n";
+    allResults << "  Warnings:     " << warningCount << "\n";
+    allResults << "  Errors:       " << errorCount << "\n";
+    allResults << "  Success Rate: " << std::fixed << std::setprecision(1) 
+               << (100.0 * (successCount + warningCount) / maxTests) << "%\n";
+    
+    // Use ApprovalTests to verify the results
+    ApprovalTests::Approvals::verify(allResults.str());
+}
+
+// Individual approval tests for each test case
+TEST_F(PointToPointExTest, ApprovalTest_FirstCase) {
+    ASSERT_FALSE(testCases.empty());
+    ASSERT_FALSE(pflDataList.empty());
+    ASSERT_TRUE(pflDataList[0].isValid);
+    
+    const P2PTestCase& testCase = testCases[0];
+    const PFLData& pflData = pflDataList[0];
+    
+    std::string result = formatPointToPointResults(testCase, pflData, 0);
+    ApprovalTests::Approvals::verify(result);
+}
+
+TEST_F(PointToPointExTest, ApprovalTest_SecondCase) {
+    ASSERT_GT(testCases.size(), 1);
+    ASSERT_GT(pflDataList.size(), 1);
+    ASSERT_TRUE(pflDataList[1].isValid);
+    
+    const P2PTestCase& testCase = testCases[1];
+    const PFLData& pflData = pflDataList[1];
+    
+    std::string result = formatPointToPointResults(testCase, pflData, 1);
+    ApprovalTests::Approvals::verify(result);
+}
+
+TEST_F(PointToPointExTest, ApprovalTest_ThirdCase) {
+    ASSERT_GT(testCases.size(), 2);
+    ASSERT_GT(pflDataList.size(), 2);
+    ASSERT_TRUE(pflDataList[2].isValid);
+    
+    const P2PTestCase& testCase = testCases[2];
+    const PFLData& pflData = pflDataList[2];
+    
+    std::string result = formatPointToPointResults(testCase, pflData, 2);
+    ApprovalTests::Approvals::verify(result);
+}
+
+TEST_F(PointToPointExTest, ApprovalTest_FourthCase) {
+    ASSERT_GT(testCases.size(), 3);
+    ASSERT_GT(pflDataList.size(), 3);
+    ASSERT_TRUE(pflDataList[3].isValid);
+    
+    const P2PTestCase& testCase = testCases[3];
+    const PFLData& pflData = pflDataList[3];
+    
+    std::string result = formatPointToPointResults(testCase, pflData, 3);
+    ApprovalTests::Approvals::verify(result);
+}
+
+// Simplified approval test for quick validation
+TEST_F(PointToPointExTest, QuickApprovalTest_Summary) {
+    ASSERT_FALSE(testCases.empty());
+    ASSERT_FALSE(pflDataList.empty());
+    ASSERT_TRUE(pflDataList[0].isValid);
+    
+    const P2PTestCase& testCase = testCases[0];
+    const PFLData& pflData = pflDataList[0];
+    
+    double A_db = 0.0;
+    long warnings = 0;
+    IntermediateValues interValues;
+    
+    int result = PointToPoint_Ex(
+        testCase.h_tx__meter,
+        testCase.h_rx__meter,
+        const_cast<double*>(pflData.pfl.data()),
+        testCase.f__mhz,
+        testCase.pol,
+        testCase.epsilon,
+        testCase.sigma,
+        testCase.p,
+        &A_db,
+        &warnings,
+        &interValues
+    );
+    
+    // Create a simple approval result for the first test case
+    std::stringstream quickResult;
+    quickResult << std::fixed << std::setprecision(3);
+    quickResult << "Quick Approval Test - First Case Summary\n";
+    quickResult << "Input: h_tx=" << testCase.h_tx__meter 
+                << "m, h_rx=" << testCase.h_rx__meter 
+                << "m, f=" << testCase.f__mhz << "MHz\n";
+    quickResult << "Result: A_db=" << A_db 
+                << "dB, warnings=0x" << std::hex << warnings << std::dec
+                << ", mode=" << interValues.mode << "\n";
+    quickResult << "Distance: " << interValues.d__km << "km\n";
+    quickResult << "Status: " << (result == SUCCESS ? "SUCCESS" : 
+                                  result == SUCCESS_WITH_WARNINGS ? "SUCCESS_WITH_WARNINGS" : "ERROR");
+    
+    ApprovalTests::Approvals::verify(quickResult.str());
+    
+    // Basic validation for approval testing
+    EXPECT_TRUE(result == SUCCESS || result == SUCCESS_WITH_WARNINGS);
+    EXPECT_GT(A_db, 0.0);
+    EXPECT_LT(A_db, 1000.0);
+}
+
 
 
 

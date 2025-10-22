@@ -1,0 +1,5 @@
+Quick Approval Test - First Case Summary
+Input: h_tx=10.000m, h_rx=1.000m, f=230.000MHz
+Result: A_db=282.670dB, warnings=0x0, mode=21
+Distance: 367.819km
+Status: SUCCESS

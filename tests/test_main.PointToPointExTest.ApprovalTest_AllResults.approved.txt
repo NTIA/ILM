@@ -1,0 +1,175 @@
+ILM PointToPoint_Ex Approval Test Results
+Generated on: October 22, 2025
+Test Cases: 5
+========================================
+
+Test Case 0:
+  Input Parameters:
+    h_tx (m):     10.000000
+    h_rx (m):     1.000000
+    f (MHz):      230.000000
+    pol:          1 (Vertical)
+    epsilon:      15.000000
+    sigma:        0.008000
+    p (%):        50.000000
+  PFL Data:
+    Points:       3679
+    Increment:    99.978050 m
+    Total Dist:   367.819246 km
+  Results:
+    Return Code:  0 (SUCCESS)
+    A_db:         282.670220 dB
+    Warnings:     0x0
+  Intermediate Values:
+    d_km:         367.819246 km
+    A_fs_db:      130.997246 dB
+    A_ref_db:     151.672972 dB
+    delta_h:      96.969711 m
+    mode:         21
+  Horizon Data:
+    TX theta:     -0.006530 rad
+    RX theta:     -0.001073 rad
+    TX d_hzn:     7398.375700 m
+    RX d_hzn:     1899.582950 m
+    TX h_e:       35.381623 m
+    RX h_e:       1.000000 m
+
+Test Case 1:
+  Input Parameters:
+    h_tx (m):     3.000000
+    h_rx (m):     1.500000
+    f (MHz):      480.000000
+    pol:          1 (Vertical)
+    epsilon:      15.000000
+    sigma:        0.008000
+    p (%):        50.000000
+  PFL Data:
+    Points:       78
+    Increment:    99.708992 m
+    Total Dist:   7.777301 km
+  Results:
+    Return Code:  1 (SUCCESS_WITH_WARNINGS)
+    A_db:         158.743531 dB
+    Warnings:     0x400
+  Intermediate Values:
+    d_km:         7.777301 km
+    A_fs_db:      103.891403 dB
+    A_ref_db:     54.852126 dB
+    delta_h:      815.222654 m
+    mode:         21
+  Horizon Data:
+    TX theta:     0.111892 rad
+    RX theta:     0.063586 rad
+    TX d_hzn:     2991.269760 m
+    RX d_hzn:     598.253952 m
+    TX h_e:       23.121079 m
+    RX h_e:       15.578091 m
+  Warning Details:
+    - RX horizon distance < 1/10 smooth earth
+
+Test Case 2:
+  Input Parameters:
+    h_tx (m):     15.000000
+    h_rx (m):     3.000000
+    f (MHz):      990.000000
+    pol:          0 (Horizontal)
+    epsilon:      15.000000
+    sigma:        0.008000
+    p (%):        50.000000
+  PFL Data:
+    Points:       280
+    Increment:    99.960312 m
+    Total Dist:   27.988887 km
+  Results:
+    Return Code:  0 (SUCCESS)
+    A_db:         154.439537 dB
+    Warnings:     0x0
+  Intermediate Values:
+    d_km:         27.988887 km
+    A_fs_db:      121.302417 dB
+    A_ref_db:     33.137118 dB
+    delta_h:      379.994464 m
+    mode:         21
+  Horizon Data:
+    TX theta:     0.016798 rad
+    RX theta:     0.012306 rad
+    TX d_hzn:     15393.888048 m
+    RX d_hzn:     9696.150264 m
+    TX h_e:       37.736171 m
+    RX h_e:       12.531573 m
+
+Test Case 3:
+  Input Parameters:
+    h_tx (m):     3.000000
+    h_rx (m):     5.000000
+    f (MHz):      5600.000000
+    pol:          0 (Horizontal)
+    epsilon:      15.000000
+    sigma:        0.008000
+    p (%):        50.000000
+  PFL Data:
+    Points:       286
+    Increment:    100.022217 m
+    Total Dist:   28.606354 km
+  Results:
+    Return Code:  1 (SUCCESS_WITH_WARNINGS)
+    A_db:         182.314562 dB
+    Warnings:     0x400
+  Intermediate Values:
+    d_km:         28.606354 km
+    A_fs_db:      136.543011 dB
+    A_ref_db:     45.771549 dB
+    delta_h:      34.096010 m
+    mode:         21
+  Horizon Data:
+    TX theta:     -0.000197 rad
+    RX theta:     -0.002055 rad
+    TX d_hzn:     3000.666510 m
+    RX d_hzn:     200.044434 m
+    TX h_e:       3.000000 m
+    RX h_e:       6.578439 m
+  Warning Details:
+    - RX horizon distance < 1/10 smooth earth
+
+Test Case 4:
+  Input Parameters:
+    h_tx (m):     1.500000
+    h_rx (m):     10.000000
+    f (MHz):      8800.000000
+    pol:          1 (Vertical)
+    epsilon:      15.000000
+    sigma:        0.008000
+    p (%):        50.000000
+  PFL Data:
+    Points:       255
+    Increment:    99.865242 m
+    Total Dist:   25.465637 km
+  Results:
+    Return Code:  1 (SUCCESS_WITH_WARNINGS)
+    A_db:         213.715992 dB
+    Warnings:     0x600
+  Intermediate Values:
+    d_km:         25.465637 km
+    A_fs_db:      139.458744 dB
+    A_ref_db:     74.257246 dB
+    delta_h:      109.279788 m
+    mode:         21
+  Horizon Data:
+    TX theta:     0.022732 rad
+    RX theta:     0.113815 rad
+    TX d_hzn:     99.865242 m
+    RX d_hzn:     99.865242 m
+    TX h_e:       1.500000 m
+    RX h_e:       10.000000 m
+  Warning Details:
+    - TX horizon distance < 1/10 smooth earth
+    - RX horizon distance < 1/10 smooth earth
+
+========================================
+Summary:
+  Total Tests:  5
+  Success:      2
+  Warnings:     3
+  Errors:       0
+  Success Rate: 100.0%
+
