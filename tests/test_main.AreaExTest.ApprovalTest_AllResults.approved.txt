@@ -1,0 +1,168 @@
+ILM Area_Ex Approval Test Results
+Generated on: October 24, 2025
+Test Cases: 5
+========================================
+
+Area Test Case 0:
+  Input Parameters:
+    h_tx (m):        10.000000
+    h_rx (m):        1.000000
+    tx_siting:       0
+    rx_siting:       0
+    d (km):          16.000000
+    delta_h (m):     0.000000
+    f (MHz):         230.000000
+    pol:             0 (Horizontal)
+    epsilon:         15.000000
+    sigma:           0.008000
+    p (%):           50.000000
+  Results:
+    Return Code:     0 (SUCCESS)
+    A_db:            177.834148 dB
+    Warnings:        0x0
+  Intermediate Values:
+    d_km:            16.000000 km
+    A_fs_db:         103.766956 dB
+    A_ref_db:        74.067191 dB
+    delta_h:         0.000000 m
+    mode:            21
+  Horizon Data:
+    TX theta:        -0.003393 rad
+    RX theta:        -0.001073 rad
+    TX d_hzn:        5894.743421 m
+    RX d_hzn:        1864.081543 m
+    TX h_e:          10.000000 m
+    RX h_e:          1.000000 m
+
+Area Test Case 1:
+  Input Parameters:
+    h_tx (m):        3.000000
+    h_rx (m):        1.500000
+    tx_siting:       1
+    rx_siting:       0
+    d (km):          10.000000
+    delta_h (m):     10.000000
+    f (MHz):         450.000000
+    pol:             0 (Horizontal)
+    epsilon:         15.000000
+    sigma:           0.008000
+    p (%):           50.000000
+  Results:
+    Return Code:     0 (SUCCESS)
+    A_db:            149.521416 dB
+    Warnings:        0x0
+  Intermediate Values:
+    d_km:            10.000000 km
+    A_fs_db:         105.514250 dB
+    A_ref_db:        44.007164 dB
+    delta_h:         10.000000 m
+    mode:            21
+  Horizon Data:
+    TX theta:        -0.003054 rad
+    RX theta:        -0.001610 rad
+    TX d_hzn:        4723.776356 m
+    RX d_hzn:        2067.843065 m
+    TX h_e:          7.544793 m
+    RX h_e:          1.500000 m
+
+Area Test Case 2:
+  Input Parameters:
+    h_tx (m):        15.000000
+    h_rx (m):        3.000000
+    tx_siting:       0
+    rx_siting:       1
+    d (km):          100.000000
+    delta_h (m):     5.000000
+    f (MHz):         980.000000
+    pol:             1 (Vertical)
+    epsilon:         15.000000
+    sigma:           0.008000
+    p (%):           50.000000
+  Results:
+    Return Code:     0 (SUCCESS)
+    A_db:            232.421625 dB
+    Warnings:        0x0
+  Intermediate Values:
+    d_km:            100.000000 km
+    A_fs_db:         132.274522 dB
+    A_ref_db:        100.147101 dB
+    delta_h:         5.000000 m
+    mode:            21
+  Horizon Data:
+    TX theta:        -0.004174 rad
+    RX theta:        -0.002566 rad
+    TX d_hzn:        6933.599200 m
+    RX d_hzn:        4087.120905 m
+    TX h_e:          15.000000 m
+    RX h_e:          5.494235 m
+
+Area Test Case 3:
+  Input Parameters:
+    h_tx (m):        3.000000
+    h_rx (m):        5.000000
+    tx_siting:       1
+    rx_siting:       1
+    d (km):          75.000000
+    delta_h (m):     20.000000
+    f (MHz):         3100.000000
+    pol:             1 (Vertical)
+    epsilon:         15.000000
+    sigma:           0.008000
+    p (%):           50.000000
+  Results:
+    Return Code:     0 (SUCCESS)
+    A_db:            234.350101 dB
+    Warnings:        0x0
+  Intermediate Values:
+    d_km:            75.000000 km
+    A_fs_db:         139.778459 dB
+    A_ref_db:        94.571639 dB
+    delta_h:         20.000000 m
+    mode:            21
+  Horizon Data:
+    TX theta:        -0.003495 rad
+    RX theta:        -0.003776 rad
+    TX d_hzn:        5079.631990 m
+    RX d_hzn:        5643.851765 m
+    TX h_e:          9.134829 m
+    RX h_e:          11.065307 m
+
+Area Test Case 4:
+  Input Parameters:
+    h_tx (m):        1.500000
+    h_rx (m):        10.000000
+    tx_siting:       1
+    rx_siting:       1
+    d (km):          25.000000
+    delta_h (m):     45.000000
+    f (MHz):         8900.000000
+    pol:             1 (Vertical)
+    epsilon:         15.000000
+    sigma:           0.008000
+    p (%):           50.000000
+  Results:
+    Return Code:     0 (SUCCESS)
+    A_db:            194.327523 dB
+    Warnings:        0x0
+  Intermediate Values:
+    d_km:            25.000000 km
+    A_fs_db:         139.396600 dB
+    A_ref_db:        54.930920 dB
+    delta_h:         45.000000 m
+    mode:            21
+  Horizon Data:
+    TX theta:        -0.003979 rad
+    RX theta:        -0.004823 rad
+    TX d_hzn:        3865.072696 m
+    RX d_hzn:        6725.171842 m
+    TX h_e:          6.257909 m
+    RX h_e:          16.411804 m
+
+========================================
+Summary:
+  Total Tests:     5
+  Success:         5
+  Warnings:        0
+  Errors:          0
+  Success Rate:    100.0%
+

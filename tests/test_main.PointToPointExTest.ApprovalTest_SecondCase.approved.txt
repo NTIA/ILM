@@ -1,0 +1,33 @@
+Test Case 1:
+  Input Parameters:
+    h_tx (m):     3.000000
+    h_rx (m):     1.500000
+    f (MHz):      480.000000
+    pol:          1 (Vertical)
+    epsilon:      15.000000
+    sigma:        0.008000
+    p (%):        50.000000
+  PFL Data:
+    Points:       78
+    Increment:    99.708992 m
+    Total Dist:   7.777301 km
+  Results:
+    Return Code:  1 (SUCCESS_WITH_WARNINGS)
+    A_db:         158.743531 dB
+    Warnings:     0x400
+  Intermediate Values:
+    d_km:         7.777301 km
+    A_fs_db:      103.891403 dB
+    A_ref_db:     54.852126 dB
+    delta_h:      815.222654 m
+    mode:         21
+  Horizon Data:
+    TX theta:     0.111892 rad
+    RX theta:     0.063586 rad
+    TX d_hzn:     2991.269760 m
+    RX d_hzn:     598.253952 m
+    TX h_e:       23.121079 m
+    RX h_e:       15.578091 m
+  Warning Details:
+    - RX horizon distance < 1/10 smooth earth
+

@@ -1,0 +1,31 @@
+Test Case 0:
+  Input Parameters:
+    h_tx (m):     10.000000
+    h_rx (m):     1.000000
+    f (MHz):      230.000000
+    pol:          1 (Vertical)
+    epsilon:      15.000000
+    sigma:        0.008000
+    p (%):        50.000000
+  PFL Data:
+    Points:       3679
+    Increment:    99.978050 m
+    Total Dist:   367.819246 km
+  Results:
+    Return Code:  0 (SUCCESS)
+    A_db:         282.670220 dB
+    Warnings:     0x0
+  Intermediate Values:
+    d_km:         367.819246 km
+    A_fs_db:      130.997246 dB
+    A_ref_db:     151.672972 dB
+    delta_h:      96.969711 m
+    mode:         21
+  Horizon Data:
+    TX theta:     -0.006530 rad
+    RX theta:     -0.001073 rad
+    TX d_hzn:     7398.375700 m
+    RX d_hzn:     1899.582950 m
+    TX h_e:       35.381623 m
+    RX h_e:       1.000000 m
+

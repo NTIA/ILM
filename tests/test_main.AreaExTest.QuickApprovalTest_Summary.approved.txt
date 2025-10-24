@@ -1,0 +1,5 @@
+Quick Area Approval Test - First Case Summary
+Input: h_tx=10.000m, h_rx=1.000m, f=230.000MHz
+       d=16.000km, delta_h=0.000m, siting=(0,0)
+Result: A_db=177.834dB, warnings=0x0, mode=21
+Status: SUCCESS

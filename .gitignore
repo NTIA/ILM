@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+*.bak
+*.received.txt
+
 # User-specific files
 *.rsuser
 *.suo
@@ -36,6 +39,7 @@ bld/
 *.lib
 *.vcxproj.FileListAbsolute.txt
 [Ii]ntermediate/
+[Bb]uild
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
