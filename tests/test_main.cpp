@@ -704,6 +704,434 @@ TEST_F(PointToPointExTest, DifferentPolarizations_ValidResults) {
               << ", Vertical polarization: A_db = " << A_db_vertical << std::endl;
 }
 
+// ===================== Area_Ex Tests =====================
+
+// Helper structure to hold area test parameters from CSV
+struct AreaTestCase {
+    double h_tx__meter;
+    double h_rx__meter;
+    int tx_siting_criteria;
+    int rx_siting_criteria;
+    double d__km;
+    double delta_h__meter;
+    double f__mhz;
+    int pol;
+    double epsilon;
+    double sigma;
+    double p;
+};
+
+// Area_Ex test fixture
+class AreaExTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        // Get paths to test data files - try multiple possible locations
+        std::vector<std::string> possiblePaths = {
+            "tests/",           // Relative to build directory
+            "../tests/",        // One level up from build
+            "../../tests/",     // Two levels up from build/Debug
+            "./tests/"          // Current directory
+        };
+        
+        bool foundData = false;
+        for (const auto& path : possiblePaths) {
+            areaTestCases = readAreaTestCases(path + "area.csv");
+            
+            if (!areaTestCases.empty()) {
+                testDataPath = path;
+                foundData = true;
+                break;
+            }
+        }
+        
+        // Verify we loaded data successfully
+        ASSERT_TRUE(foundData) << "Failed to load test data from any of the expected locations";
+        ASSERT_FALSE(areaTestCases.empty()) << "Failed to load area test cases from area.csv";
+        
+        std::cout << "Loaded " << areaTestCases.size() << " area test cases from " << testDataPath << std::endl;
+    }
+    
+    std::vector<AreaTestCase> readAreaTestCases(const std::string& filename) {
+        std::vector<AreaTestCase> testCases;
+        std::ifstream file(filename);
+        std::string line;
+        
+        // Skip header line
+        if (std::getline(file, line)) {
+            while (std::getline(file, line)) {
+                if (line.empty()) continue;
+                
+                AreaTestCase testCase;
+                std::stringstream ss(line);
+                std::string cell;
+                
+                // Parse CSV: h_tx__meter,h_rx__meter,tx_siting_criteria,rx_siting_criteria,d__km,delta_h__meter,f__mhz,pol,epsilon,sigma,p
+                if (std::getline(ss, cell, ',')) testCase.h_tx__meter = std::stod(cell);
+                if (std::getline(ss, cell, ',')) testCase.h_rx__meter = std::stod(cell);
+                if (std::getline(ss, cell, ',')) testCase.tx_siting_criteria = std::stoi(cell);
+                if (std::getline(ss, cell, ',')) testCase.rx_siting_criteria = std::stoi(cell);
+                if (std::getline(ss, cell, ',')) testCase.d__km = std::stod(cell);
+                if (std::getline(ss, cell, ',')) testCase.delta_h__meter = std::stod(cell);
+                if (std::getline(ss, cell, ',')) testCase.f__mhz = std::stod(cell);
+                if (std::getline(ss, cell, ',')) testCase.pol = std::stoi(cell);
+                if (std::getline(ss, cell, ',')) testCase.epsilon = std::stod(cell);
+                if (std::getline(ss, cell, ',')) testCase.sigma = std::stod(cell);
+                if (std::getline(ss, cell, ',')) testCase.p = std::stod(cell);
+                
+                testCases.push_back(testCase);
+            }
+        }
+        file.close();
+        return testCases;
+    }
+    
+    std::string testDataPath;
+    std::vector<AreaTestCase> areaTestCases;
+};
+
+// Test basic functionality with first test case
+TEST_F(AreaExTest, BasicFunctionality_FirstTestCase) {
+    ASSERT_FALSE(areaTestCases.empty());
+    
+    const AreaTestCase& testCase = areaTestCases[0];
+    
+    double A_db = 0.0;
+    long warnings = 0;
+    IntermediateValues interValues;
+    
+    int result = Area_Ex(
+        testCase.h_tx__meter,
+        testCase.h_rx__meter,
+        testCase.tx_siting_criteria,
+        testCase.rx_siting_criteria,
+        testCase.d__km,
+        testCase.delta_h__meter,
+        testCase.f__mhz,
+        testCase.pol,
+        testCase.epsilon,
+        testCase.sigma,
+        testCase.p,
+        &A_db,
+        &warnings,
+        &interValues
+    );
+    
+    // Basic validation
+    EXPECT_TRUE(result == SUCCESS || result == SUCCESS_WITH_WARNINGS);
+    EXPECT_GT(A_db, 0.0) << "Transmission loss should be positive";
+    EXPECT_LT(A_db, 500.0) << "Transmission loss should be reasonable (< 500 dB)";
+    
+    // Check intermediate values are populated
+    EXPECT_DOUBLE_EQ(interValues.d__km, testCase.d__km) << "Distance should match input";
+    EXPECT_GT(interValues.A_fs__db, 0.0) << "Free space loss should be positive";
+    EXPECT_GE(interValues.A_ref__db, 0.0) << "Reference attenuation should be non-negative";
+    EXPECT_DOUBLE_EQ(interValues.delta_h__meter, testCase.delta_h__meter) << "Delta H should match input";
+    
+    // Validate horizon data
+    EXPECT_GE(interValues.d_hzn__meter[0], 0.0) << "TX horizon distance should be non-negative";
+    EXPECT_GE(interValues.d_hzn__meter[1], 0.0) << "RX horizon distance should be non-negative";
+    EXPECT_GE(interValues.h_e__meter[0], 0.0) << "TX effective height should be non-negative";
+    EXPECT_GE(interValues.h_e__meter[1], 0.0) << "RX effective height should be non-negative";
+}
+
+// Test all provided test cases
+TEST_F(AreaExTest, AllTestCases_ValidResults) {
+    ASSERT_GT(areaTestCases.size(), 0) << "No valid test cases found";
+    
+    for (size_t i = 0; i < areaTestCases.size(); ++i) {
+        const AreaTestCase& testCase = areaTestCases[i];
+        
+        double A_db = 0.0;
+        long warnings = 0;
+        IntermediateValues interValues;
+        
+        int result = Area_Ex(
+            testCase.h_tx__meter,
+            testCase.h_rx__meter,
+            testCase.tx_siting_criteria,
+            testCase.rx_siting_criteria,
+            testCase.d__km,
+            testCase.delta_h__meter,
+            testCase.f__mhz,
+            testCase.pol,
+            testCase.epsilon,
+            testCase.sigma,
+            testCase.p,
+            &A_db,
+            &warnings,
+            &interValues
+        );
+        
+        // Test should succeed or succeed with warnings
+        EXPECT_TRUE(result == SUCCESS || result == SUCCESS_WITH_WARNINGS) 
+            << "Area test case " << i << " failed with error code: " << result;
+        
+        // Basic sanity checks on results
+        EXPECT_GT(A_db, 0.0) << "Area test case " << i << ": Transmission loss should be positive";
+        EXPECT_LT(A_db, 1000.0) << "Area test case " << i << ": Transmission loss should be reasonable";
+        EXPECT_DOUBLE_EQ(interValues.d__km, testCase.d__km) << "Area test case " << i << ": Distance should match input";
+        
+        // Log results for debugging
+        std::cout << "Area test case " << i << ": "
+                  << "A_db=" << A_db 
+                  << ", d_km=" << interValues.d__km
+                  << ", warnings=0x" << std::hex << warnings << std::dec
+                  << ", mode=" << interValues.mode << std::endl;
+    }
+}
+
+// Test error conditions with invalid inputs
+TEST_F(AreaExTest, InvalidInputs_ErrorHandling) {
+    double A_db = 0.0;
+    long warnings = 0;
+    IntermediateValues interValues;
+    
+    // Test with invalid frequency (too low)
+    int result = Area_Ex(
+        10.0,   // h_tx
+        2.0,    // h_rx
+        0,      // tx_siting_criteria
+        0,      // rx_siting_criteria
+        10.0,   // d__km
+        5.0,    // delta_h__meter
+        15.0,   // f_mhz - too low (should be >= 20)
+        POLARIZATION__HORIZONTAL,
+        15.0,   // epsilon
+        0.008,  // sigma
+        50.0,   // p
+        &A_db,
+        &warnings,
+        &interValues
+    );
+    
+    EXPECT_EQ(result, ERROR__FREQUENCY);
+    
+    // Test with invalid polarization
+    result = Area_Ex(
+        10.0,   // h_tx
+        2.0,    // h_rx
+        0,      // tx_siting_criteria
+        0,      // rx_siting_criteria
+        10.0,   // d__km
+        5.0,    // delta_h__meter
+        1000.0, // f_mhz
+        99,     // pol - invalid
+        15.0,   // epsilon
+        0.008,  // sigma
+        50.0,   // p
+        &A_db,
+        &warnings,
+        &interValues
+    );
+    
+    EXPECT_EQ(result, ERROR__POLARIZATION);
+    
+    // Test with invalid percentage
+    result = Area_Ex(
+        10.0,   // h_tx
+        2.0,    // h_rx
+        0,      // tx_siting_criteria
+        0,      // rx_siting_criteria
+        10.0,   // d__km
+        5.0,    // delta_h__meter
+        1000.0, // f_mhz
+        POLARIZATION__HORIZONTAL,
+        15.0,   // epsilon
+        0.008,  // sigma
+        150.0,  // p - too high (should be < 100)
+        &A_db,
+        &warnings,
+        &interValues
+    );
+    
+    EXPECT_EQ(result, ERROR__INVALID_PERCENTAGE);
+}
+
+// Test warning conditions
+TEST_F(AreaExTest, WarningConditions_SuccessWithWarnings) {
+    double A_db = 0.0;
+    long warnings = 0;
+    IntermediateValues interValues;
+    
+    // Test with parameters that should generate warnings
+    int result = Area_Ex(
+        0.8,    // h_tx - below warning threshold (< 1.0)
+        1200.0, // h_rx - above warning threshold (> 1000.0)
+        0,      // tx_siting_criteria
+        0,      // rx_siting_criteria
+        10.0,   // d__km
+        5.0,    // delta_h__meter
+        35.0,   // f_mhz - below warning threshold (< 40.0)
+        POLARIZATION__VERTICAL,
+        15.0,   // epsilon
+        0.008,  // sigma
+        50.0,   // p
+        &A_db,
+        &warnings,
+        &interValues
+    );
+    
+    EXPECT_EQ(result, SUCCESS_WITH_WARNINGS);
+    EXPECT_NE(warnings & WARN__TX_TERMINAL_HEIGHT, 0);
+    EXPECT_NE(warnings & WARN__RX_TERMINAL_HEIGHT, 0);
+    EXPECT_NE(warnings & WARN__FREQUENCY, 0);
+    EXPECT_GT(A_db, 0.0);
+}
+
+// Test different polarizations
+TEST_F(AreaExTest, DifferentPolarizations_ValidResults) {
+    ASSERT_FALSE(areaTestCases.empty());
+    
+    const AreaTestCase& baseCase = areaTestCases[0];
+    
+    // Test horizontal polarization
+    double A_db_horizontal = 0.0;
+    long warnings_h = 0;
+    IntermediateValues interValues_h;
+    
+    int result_h = Area_Ex(
+        baseCase.h_tx__meter,
+        baseCase.h_rx__meter,
+        baseCase.tx_siting_criteria,
+        baseCase.rx_siting_criteria,
+        baseCase.d__km,
+        baseCase.delta_h__meter,
+        baseCase.f__mhz,
+        POLARIZATION__HORIZONTAL,
+        baseCase.epsilon,
+        baseCase.sigma,
+        baseCase.p,
+        &A_db_horizontal,
+        &warnings_h,
+        &interValues_h
+    );
+    
+    // Test vertical polarization
+    double A_db_vertical = 0.0;
+    long warnings_v = 0;
+    IntermediateValues interValues_v;
+    
+    int result_v = Area_Ex(
+        baseCase.h_tx__meter,
+        baseCase.h_rx__meter,
+        baseCase.tx_siting_criteria,
+        baseCase.rx_siting_criteria,
+        baseCase.d__km,
+        baseCase.delta_h__meter,
+        baseCase.f__mhz,
+        POLARIZATION__VERTICAL,
+        baseCase.epsilon,
+        baseCase.sigma,
+        baseCase.p,
+        &A_db_vertical,
+        &warnings_v,
+        &interValues_v
+    );
+    
+    // Both should succeed
+    EXPECT_TRUE(result_h == SUCCESS || result_h == SUCCESS_WITH_WARNINGS);
+    EXPECT_TRUE(result_v == SUCCESS || result_v == SUCCESS_WITH_WARNINGS);
+    
+    // Both should produce valid results
+    EXPECT_GT(A_db_horizontal, 0.0);
+    EXPECT_GT(A_db_vertical, 0.0);
+    
+    // Results might differ due to polarization effects
+    std::cout << "Area Horizontal polarization: A_db = " << A_db_horizontal 
+              << ", Area Vertical polarization: A_db = " << A_db_vertical << std::endl;
+}
+
+// Test different siting criteria
+TEST_F(AreaExTest, DifferentSitingCriteria_ValidResults) {
+    ASSERT_FALSE(areaTestCases.empty());
+    
+    const AreaTestCase& baseCase = areaTestCases[0];
+    
+    // Test different combinations of siting criteria (0, 1 only - 2 is invalid)
+    std::vector<std::pair<int, int>> sitingCombinations = {
+        {0, 0}, {0, 1},
+        {1, 0}, {1, 1}
+    };
+    
+    for (const auto& combo : sitingCombinations) {
+        double A_db = 0.0;
+        long warnings = 0;
+        IntermediateValues interValues;
+        
+        int result = Area_Ex(
+            baseCase.h_tx__meter,
+            baseCase.h_rx__meter,
+            combo.first,    // tx_siting_criteria
+            combo.second,   // rx_siting_criteria
+            baseCase.d__km,
+            baseCase.delta_h__meter,
+            baseCase.f__mhz,
+            baseCase.pol,
+            baseCase.epsilon,
+            baseCase.sigma,
+            baseCase.p,
+            &A_db,
+            &warnings,
+            &interValues
+        );
+        
+        EXPECT_TRUE(result == SUCCESS || result == SUCCESS_WITH_WARNINGS)
+            << "Siting criteria (" << combo.first << "," << combo.second << ") failed";
+        EXPECT_GT(A_db, 0.0) << "Siting criteria (" << combo.first << "," << combo.second << ") produced invalid loss";
+        
+        std::cout << "Siting criteria (" << combo.first << "," << combo.second 
+                  << "): A_db = " << A_db << " dB" << std::endl;
+    }
+}
+
+// Test intermediate values consistency
+TEST_F(AreaExTest, IntermediateValues_Consistency) {
+    ASSERT_FALSE(areaTestCases.empty());
+    
+    const AreaTestCase& testCase = areaTestCases[0];
+    
+    double A_db = 0.0;
+    long warnings = 0;
+    IntermediateValues interValues;
+    
+    int result = Area_Ex(
+        testCase.h_tx__meter,
+        testCase.h_rx__meter,
+        testCase.tx_siting_criteria,
+        testCase.rx_siting_criteria,
+        testCase.d__km,
+        testCase.delta_h__meter,
+        testCase.f__mhz,
+        testCase.pol,
+        testCase.epsilon,
+        testCase.sigma,
+        testCase.p,
+        &A_db,
+        &warnings,
+        &interValues
+    );
+    
+    EXPECT_TRUE(result == SUCCESS || result == SUCCESS_WITH_WARNINGS);
+    
+    // Verify intermediate values consistency
+    EXPECT_DOUBLE_EQ(interValues.d__km, testCase.d__km) << "Distance should match input";
+    EXPECT_DOUBLE_EQ(interValues.delta_h__meter, testCase.delta_h__meter) << "Delta H should match input";
+    EXPECT_GT(interValues.A_fs__db, 0.0) << "Free space loss should be positive";
+    
+    // Free space loss should be less than total loss (in most cases)
+    EXPECT_LE(interValues.A_fs__db, A_db + 50.0) << "Free space loss should be reasonable compared to total loss";
+    
+    // Propagation mode should be valid
+    EXPECT_GE(interValues.mode, MODE__NOT_SET);
+    EXPECT_NE(interValues.mode, MODE__NOT_SET) << "Propagation mode should be determined";
+    
+    // Horizon angles should be reasonable (in radians, typically small)
+    EXPECT_GE(interValues.theta_hzn[0], -0.5) << "TX horizon angle should be reasonable";
+    EXPECT_LE(interValues.theta_hzn[0], 0.5) << "TX horizon angle should be reasonable";
+    EXPECT_GE(interValues.theta_hzn[1], -0.5) << "RX horizon angle should be reasonable";
+    EXPECT_LE(interValues.theta_hzn[1], 0.5) << "RX horizon angle should be reasonable";
+}
+
 // Test intermediate values consistency
 TEST_F(PointToPointExTest, IntermediateValues_Consistency) {
     ASSERT_FALSE(testCases.empty());
@@ -1052,6 +1480,304 @@ TEST_F(PointToPointExTest, QuickApprovalTest_Summary) {
                 << "dB, warnings=0x" << std::hex << warnings << std::dec
                 << ", mode=" << interValues.mode << "\n";
     quickResult << "Distance: " << interValues.d__km << "km\n";
+    quickResult << "Status: " << (result == SUCCESS ? "SUCCESS" : 
+                                  result == SUCCESS_WITH_WARNINGS ? "SUCCESS_WITH_WARNINGS" : "ERROR");
+    
+    ApprovalTests::Approvals::verify(quickResult.str());
+    
+    // Basic validation for approval testing
+    EXPECT_TRUE(result == SUCCESS || result == SUCCESS_WITH_WARNINGS);
+    EXPECT_GT(A_db, 0.0);
+    EXPECT_LT(A_db, 1000.0);
+}
+
+// ===================== Area_Ex Approval Tests =====================
+
+// Helper function to format area test results for approval testing
+std::string formatAreaResults(const AreaTestCase& testCase, size_t testIndex) {
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(6);
+    
+    ss << "Area Test Case " << testIndex << ":\n";
+    ss << "  Input Parameters:\n";
+    ss << "    h_tx (m):        " << testCase.h_tx__meter << "\n";
+    ss << "    h_rx (m):        " << testCase.h_rx__meter << "\n";
+    ss << "    tx_siting:       " << testCase.tx_siting_criteria << "\n";
+    ss << "    rx_siting:       " << testCase.rx_siting_criteria << "\n";
+    ss << "    d (km):          " << testCase.d__km << "\n";
+    ss << "    delta_h (m):     " << testCase.delta_h__meter << "\n";
+    ss << "    f (MHz):         " << testCase.f__mhz << "\n";
+    ss << "    pol:             " << testCase.pol << " (" 
+       << (testCase.pol == POLARIZATION__HORIZONTAL ? "Horizontal" : "Vertical") << ")\n";
+    ss << "    epsilon:         " << testCase.epsilon << "\n";
+    ss << "    sigma:           " << testCase.sigma << "\n";
+    ss << "    p (%):           " << testCase.p << "\n";
+    
+    double A_db = 0.0;
+    long warnings = 0;
+    IntermediateValues interValues;
+    
+    int result = Area_Ex(
+        testCase.h_tx__meter,
+        testCase.h_rx__meter,
+        testCase.tx_siting_criteria,
+        testCase.rx_siting_criteria,
+        testCase.d__km,
+        testCase.delta_h__meter,
+        testCase.f__mhz,
+        testCase.pol,
+        testCase.epsilon,
+        testCase.sigma,
+        testCase.p,
+        &A_db,
+        &warnings,
+        &interValues
+    );
+    
+    ss << "  Results:\n";
+    ss << "    Return Code:     " << result;
+    
+    if (result == SUCCESS) {
+        ss << " (SUCCESS)\n";
+    } else if (result == SUCCESS_WITH_WARNINGS) {
+        ss << " (SUCCESS_WITH_WARNINGS)\n";
+    } else {
+        ss << " (ERROR)\n";
+    }
+    
+    if (result == SUCCESS || result == SUCCESS_WITH_WARNINGS) {
+        ss << "    A_db:            " << A_db << " dB\n";
+        ss << "    Warnings:        0x" << std::hex << warnings << std::dec << "\n";
+        
+        ss << "  Intermediate Values:\n";
+        ss << "    d_km:            " << interValues.d__km << " km\n";
+        ss << "    A_fs_db:         " << interValues.A_fs__db << " dB\n";
+        ss << "    A_ref_db:        " << interValues.A_ref__db << " dB\n";
+        ss << "    delta_h:         " << interValues.delta_h__meter << " m\n";
+        ss << "    mode:            " << interValues.mode << "\n";
+        
+        ss << "  Horizon Data:\n";
+        ss << "    TX theta:        " << interValues.theta_hzn[0] << " rad\n";
+        ss << "    RX theta:        " << interValues.theta_hzn[1] << " rad\n";
+        ss << "    TX d_hzn:        " << interValues.d_hzn__meter[0] << " m\n";
+        ss << "    RX d_hzn:        " << interValues.d_hzn__meter[1] << " m\n";
+        ss << "    TX h_e:          " << interValues.h_e__meter[0] << " m\n";
+        ss << "    RX h_e:          " << interValues.h_e__meter[1] << " m\n";
+        
+        // Decode warnings if present
+        if (warnings != 0) {
+            ss << "  Warning Details:\n";
+            if (warnings & WARN__TX_TERMINAL_HEIGHT) 
+                ss << "    - TX height near limits\n";
+            if (warnings & WARN__RX_TERMINAL_HEIGHT) 
+                ss << "    - RX height near limits\n";
+            if (warnings & WARN__FREQUENCY) 
+                ss << "    - Frequency near limits\n";
+            if (warnings & WARN__PATH_DISTANCE_TOO_BIG_1) 
+                ss << "    - Path distance near upper limit\n";
+            if (warnings & WARN__PATH_DISTANCE_TOO_BIG_2) 
+                ss << "    - Path distance large\n";
+            if (warnings & WARN__PATH_DISTANCE_TOO_SMALL_1) 
+                ss << "    - Path distance near lower limit\n";
+            if (warnings & WARN__PATH_DISTANCE_TOO_SMALL_2) 
+                ss << "    - Path distance small\n";
+            if (warnings & WARN__TX_HORIZON_ANGLE) 
+                ss << "    - TX horizon angle large\n";
+            if (warnings & WARN__RX_HORIZON_ANGLE) 
+                ss << "    - RX horizon angle large\n";
+            if (warnings & WARN__TX_HORIZON_DISTANCE_1) 
+                ss << "    - TX horizon distance < 1/10 smooth earth\n";
+            if (warnings & WARN__RX_HORIZON_DISTANCE_1) 
+                ss << "    - RX horizon distance < 1/10 smooth earth\n";
+            if (warnings & WARN__TX_HORIZON_DISTANCE_2) 
+                ss << "    - TX horizon distance > 3x smooth earth\n";
+            if (warnings & WARN__RX_HORIZON_DISTANCE_2) 
+                ss << "    - RX horizon distance > 3x smooth earth\n";
+        }
+    } else {
+        // Decode error codes
+        ss << "  Error Details:\n";
+        switch (result) {
+            case ERROR__TX_TERMINAL_HEIGHT:
+                ss << "    - TX terminal height out of range\n";
+                break;
+            case ERROR__RX_TERMINAL_HEIGHT:
+                ss << "    - RX terminal height out of range\n";
+                break;
+            case ERROR__FREQUENCY:
+                ss << "    - Frequency out of range\n";
+                break;
+            case ERROR__POLARIZATION:
+                ss << "    - Invalid polarization\n";
+                break;
+            case ERROR__EPSILON:
+                ss << "    - Epsilon out of range\n";
+                break;
+            case ERROR__SIGMA:
+                ss << "    - Sigma out of range\n";
+                break;
+            case ERROR__INVALID_PERCENTAGE:
+                ss << "    - Invalid percentage\n";
+                break;
+            default:
+                ss << "    - Unknown error code: " << result << "\n";
+                break;
+        }
+    }
+    
+    return ss.str();
+}
+
+// Approval test using the official ApprovalTests framework
+TEST_F(AreaExTest, ApprovalTest_AllResults) {
+    ASSERT_GT(areaTestCases.size(), 0) << "No valid area test cases found for approval test";
+    
+    std::stringstream allResults;
+    allResults << "ILM Area_Ex Approval Test Results\n";
+    allResults << "Generated on: October 24, 2025\n";
+    allResults << "Test Cases: " << areaTestCases.size() << "\n";
+    allResults << "========================================\n\n";
+    
+    int successCount = 0;
+    int warningCount = 0;
+    int errorCount = 0;
+    
+    for (size_t i = 0; i < areaTestCases.size(); ++i) {
+        const AreaTestCase& testCase = areaTestCases[i];
+        
+        allResults << formatAreaResults(testCase, i);
+        allResults << "\n";
+        
+        // Count results for summary
+        double A_db = 0.0;
+        long warnings = 0;
+        IntermediateValues interValues;
+        
+        int result = Area_Ex(
+            testCase.h_tx__meter,
+            testCase.h_rx__meter,
+            testCase.tx_siting_criteria,
+            testCase.rx_siting_criteria,
+            testCase.d__km,
+            testCase.delta_h__meter,
+            testCase.f__mhz,
+            testCase.pol,
+            testCase.epsilon,
+            testCase.sigma,
+            testCase.p,
+            &A_db,
+            &warnings,
+            &interValues
+        );
+        
+        if (result == SUCCESS) {
+            successCount++;
+        } else if (result == SUCCESS_WITH_WARNINGS) {
+            warningCount++;
+        } else {
+            errorCount++;
+        }
+    }
+    
+    // Add summary
+    allResults << "========================================\n";
+    allResults << "Summary:\n";
+    allResults << "  Total Tests:     " << areaTestCases.size() << "\n";
+    allResults << "  Success:         " << successCount << "\n";
+    allResults << "  Warnings:        " << warningCount << "\n";
+    allResults << "  Errors:          " << errorCount << "\n";
+    allResults << "  Success Rate:    " << std::fixed << std::setprecision(1) 
+               << (100.0 * (successCount + warningCount) / areaTestCases.size()) << "%\n";
+    
+    // Use ApprovalTests to verify the results
+    ApprovalTests::Approvals::verify(allResults.str());
+}
+
+// Individual approval tests for each area test case
+TEST_F(AreaExTest, ApprovalTest_FirstCase) {
+    ASSERT_FALSE(areaTestCases.empty());
+    
+    const AreaTestCase& testCase = areaTestCases[0];
+    
+    std::string result = formatAreaResults(testCase, 0);
+    ApprovalTests::Approvals::verify(result);
+}
+
+TEST_F(AreaExTest, ApprovalTest_SecondCase) {
+    ASSERT_GT(areaTestCases.size(), 1);
+    
+    const AreaTestCase& testCase = areaTestCases[1];
+    
+    std::string result = formatAreaResults(testCase, 1);
+    ApprovalTests::Approvals::verify(result);
+}
+
+TEST_F(AreaExTest, ApprovalTest_ThirdCase) {
+    ASSERT_GT(areaTestCases.size(), 2);
+    
+    const AreaTestCase& testCase = areaTestCases[2];
+    
+    std::string result = formatAreaResults(testCase, 2);
+    ApprovalTests::Approvals::verify(result);
+}
+
+TEST_F(AreaExTest, ApprovalTest_FourthCase) {
+    ASSERT_GT(areaTestCases.size(), 3);
+    
+    const AreaTestCase& testCase = areaTestCases[3];
+    
+    std::string result = formatAreaResults(testCase, 3);
+    ApprovalTests::Approvals::verify(result);
+}
+
+TEST_F(AreaExTest, ApprovalTest_FifthCase) {
+    ASSERT_GT(areaTestCases.size(), 4);
+    
+    const AreaTestCase& testCase = areaTestCases[4];
+    
+    std::string result = formatAreaResults(testCase, 4);
+    ApprovalTests::Approvals::verify(result);
+}
+
+// Simplified approval test for quick validation
+TEST_F(AreaExTest, QuickApprovalTest_Summary) {
+    ASSERT_FALSE(areaTestCases.empty());
+    
+    const AreaTestCase& testCase = areaTestCases[0];
+    
+    double A_db = 0.0;
+    long warnings = 0;
+    IntermediateValues interValues;
+    
+    int result = Area_Ex(
+        testCase.h_tx__meter,
+        testCase.h_rx__meter,
+        testCase.tx_siting_criteria,
+        testCase.rx_siting_criteria,
+        testCase.d__km,
+        testCase.delta_h__meter,
+        testCase.f__mhz,
+        testCase.pol,
+        testCase.epsilon,
+        testCase.sigma,
+        testCase.p,
+        &A_db,
+        &warnings,
+        &interValues
+    );
+    
+    // Create a simple approval result for the first area test case
+    std::stringstream quickResult;
+    quickResult << std::fixed << std::setprecision(3);
+    quickResult << "Quick Area Approval Test - First Case Summary\n";
+    quickResult << "Input: h_tx=" << testCase.h_tx__meter 
+                << "m, h_rx=" << testCase.h_rx__meter 
+                << "m, f=" << testCase.f__mhz << "MHz\n";
+    quickResult << "       d=" << testCase.d__km << "km, delta_h=" << testCase.delta_h__meter 
+                << "m, siting=(" << testCase.tx_siting_criteria << "," << testCase.rx_siting_criteria << ")\n";
+    quickResult << "Result: A_db=" << A_db 
+                << "dB, warnings=0x" << std::hex << warnings << std::dec
+                << ", mode=" << interValues.mode << "\n";
     quickResult << "Status: " << (result == SUCCESS ? "SUCCESS" : 
                                   result == SUCCESS_WITH_WARNINGS ? "SUCCESS_WITH_WARNINGS" : "ERROR");
     

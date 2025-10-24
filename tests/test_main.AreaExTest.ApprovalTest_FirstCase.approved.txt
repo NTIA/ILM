@@ -1,0 +1,31 @@
+Area Test Case 0:
+  Input Parameters:
+    h_tx (m):        10.000000
+    h_rx (m):        1.000000
+    tx_siting:       0
+    rx_siting:       0
+    d (km):          16.000000
+    delta_h (m):     0.000000
+    f (MHz):         230.000000
+    pol:             0 (Horizontal)
+    epsilon:         15.000000
+    sigma:           0.008000
+    p (%):           50.000000
+  Results:
+    Return Code:     0 (SUCCESS)
+    A_db:            177.834148 dB
+    Warnings:        0x0
+  Intermediate Values:
+    d_km:            16.000000 km
+    A_fs_db:         103.766956 dB
+    A_ref_db:        74.067191 dB
+    delta_h:         0.000000 m
+    mode:            21
+  Horizon Data:
+    TX theta:        -0.003393 rad
+    RX theta:        -0.001073 rad
+    TX d_hzn:        5894.743421 m
+    RX d_hzn:        1864.081543 m
+    TX h_e:          10.000000 m
+    RX h_e:          1.000000 m
+
