@@ -97,11 +97,11 @@ double SmoothSphereDiffraction(
         C_0[i] = pow((4.0 / 3.0) * radius__meter / a__meter[i], THIRD);
 
         // [Vogler 1964, Eqn 6a / 7a].
-        K[i] = 0.017778 * C_0[i] * pow(f__mhz, -THIRD) / abs(Z_g);
+        K[i] = 0.017778 * C_0[i] * pow(f__mhz, -THIRD) / std::abs(Z_g);
 
         // Compute B_0 for each radius.
         // [Vogler 1964, Fig 4], [RLS, A-76].
-        B_0[i] = 1.607 - abs(K[i]);
+        B_0[i] = 1.607 - std::abs(K[i]);
     }
 
     // Compute x__km for each radius [RLS].
